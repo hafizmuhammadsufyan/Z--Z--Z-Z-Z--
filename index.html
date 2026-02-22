@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>A Quiet Place</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #0d1117;
+            --card: #121821;
+            --accent: #7fb3ad;
+            --soft: #b6cfc9;
+            --text: #e6e6e6;
+            --muted: #9aa3a3;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: Inter, sans-serif;
+            background: radial-gradient(circle at top, #111827, #0d1117);
+            color: var(--text);
+            line-height: 1.75;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 70px 20px;
+        }
+
+        h1 {
+            font-weight: 400;
+            font-size: 2.3rem;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+
+        .intro {
+            max-width: 650px;
+            color: #d4d4d4;
+            font-size: 1.05rem;
+            min-height: 90px;
+        }
+
+        hr {
+            border: none;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.08);
+            margin: 50px 0;
+        }
+
+        /* BUTTON GRID */
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 14px;
+        }
+
+        button {
+            background: rgba(127, 179, 173, 0.08);
+            border: 1px solid rgba(127, 179, 173, 0.25);
+            color: var(--text);
+            padding: 14px;
+            border-radius: 16px;
+            font-size: .95rem;
+            cursor: pointer;
+            transition: all .3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle, rgba(127, 179, 173, .25), transparent 60%);
+            opacity: 0;
+            transition: .3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            background: rgba(127, 179, 173, 0.18);
+        }
+
+        button:hover::after {
+            opacity: 1
+        }
+
+        /* CONTENT BOX */
+        .content-box {
+            margin-top: 45px;
+            padding: 35px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, .04), rgba(255, 255, 255, .02));
+            border-radius: 22px;
+            display: none;
+            animation: fadeUp .6s ease forwards;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h3 {
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        .ayah {
+            margin-bottom: 12px;
+            color: var(--soft);
+            font-size: 1rem;
+        }
+
+        .urdu {
+            font-size: .95rem;
+            color: #dcdcdc;
+        }
+
+        .quote {
+            font-style: italic;
+            color: #cfcfcf;
+            margin-bottom: 8px;
+        }
+
+        .psych {
+            font-size: .95rem;
+            color: #d6d6d6;
+        }
+
+        .presence {
+            margin-top: 25px;
+            padding-top: 18px;
+            border-top: 1px solid rgba(255, 255, 255, .08);
+            color: #cfdede;
+            font-size: .9rem;
+        }
+
+        /* FOOTER */
+        .footer {
+            margin-top: 80px;
+            text-align: center;
+            font-size: .85rem;
+            color: var(--muted);
+        }
+
+        /* RESPONSIVE */
+        @media(max-width:600px) {
+            h1 {
+                font-size: 2rem
+            }
+
+            .intro {
+                font-size: 1rem
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <h1 id="type"></h1>
+        <p class="intro" id="intro"></p>
+
+        <hr>
+
+        <div class="buttons">
+            <button onclick="show('tired')">When you feel tired</button>
+            <button onclick="show('sad')">When sadness feels heavy</button>
+            <button onclick="show('lost')">When you feel lost</button>
+            <button onclick="show('anxious')">When anxiety rises</button>
+            <button onclick="show('alone')">When you feel alone</button>
+            <button onclick="show('overthinking')">When thoughts won’t stop</button>
+            <button onclick="show('broken')">When something hurts</button>
+            <button onclick="show('unseen')">When you feel unseen</button>
+            <button onclick="show('afraid')">When fear feels close</button>
+            <button onclick="show('hopeless')">When hope feels far</button>
+            <button onclick="show('peace')">When you want calm</button>
+        </div>
+
+        <div id="box" class="content-box"></div>
+
+        <div class="footer">
+            This place doesn’t ask anything from you.
+        </div>
+
+    </div>
+
+    <script>
+        /* TYPING INTRO */
+        const title = "A Quiet Place";
+        const introText = "This space doesn’t need explanations.\nYou don’t have to reply.\nJust notice what you’re feeling.";
+
+        let i = 0, j = 0;
+        function typeTitle() {
+            if (i < title.length) {
+                document.getElementById("type").innerHTML += title.charAt(i++);
+                setTimeout(typeTitle, 80);
+            } else typeIntro();
+        }
+        function typeIntro() {
+            if (j < introText.length) {
+                document.getElementById("intro").innerHTML +=
+                    introText.charAt(j) === "\n" ? "<br>" : introText.charAt(j);
+                j++; setTimeout(typeIntro, 40);
+            }
+        }
+        typeTitle();
+
+        /* DATA */
+        const data = {
+            tired: {
+                verses: [
+                    ["وَجَعَلْنَا نَوْمَكُمْ سُبَاتًا", "اور ہم نے تمہاری نیند کو آرام کا ذریعہ بنایا۔"],
+                    ["لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا", "اللہ کسی جان پر اس کی طاقت سے زیادہ بوجھ نہیں ڈالتا۔"],
+                    ["إِنَّ مَعَ الْعُسْرِ يُسْرًا", "بے شک تنگی کے ساتھ آسانی ہے۔"]
+                ],
+                quotes: [
+                    "Rest is not quitting. It’s recalibrating.",
+                    "Your body speaks before your mind understands.",
+                    "Even the strongest pause."
+                ],
+                psych: [
+                    "Fatigue lowers emotional regulation. Rest restores perspective.",
+                    "Your nervous system needs safety before clarity."
+                ]
+            },
+            sad: {
+                verses: [
+                    ["لَا تَحْزَنْ إِنَّ اللَّهَ مَعَنَا", "غم نہ کرو، اللہ ہمارے ساتھ ہے۔"],
+                    ["فَإِنَّ مَعَ الْعُسْرِ يُسْرًا", "یقیناً مشکل کے ساتھ آسانی ہے۔"],
+                    ["إِنَّ اللَّهَ قَرِيبٌ", "بے شک اللہ قریب ہے۔"]
+                ],
+                quotes: [
+                    "Sadness means something mattered.",
+                    "Tears are the body releasing weight.",
+                    "This feeling is not permanent."
+                ],
+                psych: [
+                    "Allowing sadness shortens its stay.",
+                    "Suppression makes emotions louder."
+                ]
+            },
+            lost: {
+                verses: [
+                    ["وَوَجَدَكَ ضَالًّا فَهَدَى", "اور اس نے تمہیں راستہ بھٹکا ہوا پایا تو ہدایت دی۔"],
+                    ["وَعَسَىٰ أَن تَكْرَهُوا شَيْئًا", "ممکن ہے تم کسی چیز کو ناپسند کرو اور وہی تمہارے لیے بہتر ہو۔"],
+                    ["اللَّهُ نُورُ السَّمَاوَاتِ", "اللہ آسمانوں اور زمین کا نور ہے۔"]
+                ],
+                quotes: [
+                    "Being lost often means transformation.",
+                    "Direction comes quietly.",
+                    "You’re between versions of yourself."
+                ],
+                psych: [
+                    "Uncertainty triggers growth.",
+                    "The mind needs time to reorganize identity."
+                ]
+            },
+            anxious: {
+                verses: [
+                    ["أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ", "خبردار! اللہ کے ذکر سے دلوں کو سکون ملتا ہے۔"],
+                    ["وَهُوَ مَعَكُمْ", "وہ تمہارے ساتھ ہے۔"],
+                    ["رَبِّ اشْرَحْ لِي صَدْرِي", "اے رب! میرا سینہ کھول دے۔"]
+                ],
+                quotes: [
+                    "Anxiety is anticipation without grounding.",
+                    "Breathe first, think later.",
+                    "You are safer than you feel."
+                ],
+                psych: [
+                    "Slow breathing signals safety to the brain.",
+                    "Presence reduces future-based fear."
+                ]
+            },
+            alone: {
+                verses: [
+                    ["وَهُوَ مَعَكُمْ أَيْنَ مَا كُنتُمْ", "وہ تمہارے ساتھ ہے جہاں بھی تم ہو۔"],
+                    ["إِنَّ اللَّهَ لَطِيفٌ", "بے شک اللہ نہایت مہربان ہے۔"],
+                    ["وَلَقَدْ خَلَقْنَا الْإِنسَانَ", "ہم نے انسان کو پیدا کیا۔"]
+                ],
+                quotes: [
+                    "Loneliness is not absence.",
+                    "Quiet company exists.",
+                    "Stillness can hold you."
+                ],
+                psych: [
+                    "Connection can be felt without interaction.",
+                    "Safety reduces loneliness."
+                ]
+            },
+            hopeless: {
+                verses: [
+                    ["لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ", "اللہ کی رحمت سے ناامید نہ ہو۔"],
+                    ["إِنَّ اللَّهَ غَفُورٌ رَّحِيمٌ", "بے شک اللہ بہت بخشنے والا ہے۔"],
+                    ["وَاللَّهُ لَطِيفٌ", "اللہ باریک بین ہے۔"]
+                ],
+                quotes: [
+                    "Hope hides, it doesn’t disappear.",
+                    "Delays are not denials.",
+                    "Even pauses move things forward."
+                ],
+                psych: [
+                    "Hopelessness narrows perception.",
+                    "Small reassurance widens vision."
+                ]
+            },
+            peace: {
+                verses: [
+                    ["يَا أَيَّتُهَا النَّفْسُ الْمُطْمَئِنَّةُ", "اے اطمینان پانے والی جان۔"],
+                    ["سَلَامٌ قَوْلًا", "سلامتی کا پیغام۔"],
+                    ["اللَّهُ وَلِيُّ الَّذِينَ آمَنُوا", "اللہ ایمان والوں کا دوست ہے۔"]
+                ],
+                quotes: [
+                    "Peace doesn’t announce itself.",
+                    "It settles quietly.",
+                    "Stillness is strength."
+                ],
+                psych: [
+                    "Calm emerges when threat perception drops.",
+                    "Soft focus creates regulation."
+                ]
+            }
+        };
+
+        function show(key) {
+            const box = document.getElementById("box");
+            const d = data[key];
+            box.style.display = "block";
+            box.innerHTML = `
+ <div class="section">
+  <h3>Verses</h3>
+  ${d.verses.map(v => `
+   <div class="ayah">${v[0]}</div>
+   <div class="urdu">${v[1]}</div>
+  `).join("")}
+ </div>
+
+ <div class="section">
+  <h3>Quiet Thoughts</h3>
+  ${d.quotes.map(q => `<div class="quote">“${q}”</div>`).join("")}
+ </div>
+
+ <div class="section">
+  <h3>Understanding</h3>
+  ${d.psych.map(p => `<div class="psych">${p}</div>`).join("")}
+ </div>
+
+ <div class="presence">
+  Some things don’t need to be said out loud to be held.
+ </div>
+ `;
+            box.scrollIntoView({ behavior: "smooth" });
+        }
+
+
+        // “Main tumhein samajh raha hoon —
+// bina tumse poochay, bina tumhein bolnay par majboor kiye.”
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Quiet Celebration</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@200;300&display=swap');
+
+  :root {
+    --bg-start: #080c14;
+    --bg-mid: #0f1620;
+    --bg-warm: #1a1208;
+    --bg-end: #12090a;
+    --gold: #c9a84c;
+    --amber: #e8a84c;
+    --cream: #f5ead8;
+    --text-dim: rgba(245, 234, 216, 0.45);
+    --text-soft: rgba(245, 234, 216, 0.72);
+    --text-full: rgba(245, 234, 216, 0.92);
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg-start);
+    color: var(--cream);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* ─── NOISE TEXTURE OVERLAY ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.35;
+  }
+
+  /* ─── SCROLL PROGRESS ─── */
+  #progress-line {
+    position: fixed;
+    top: 0; left: 0;
+    height: 1px;
+    width: 0%;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    z-index: 999;
+    transition: width 0.1s linear;
+  }
+
+  /* ─── SECTION BASE ─── */
+  section {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6rem 2rem;
+    position: relative;
+  }
+
+  /* ─── OPENING SECTION ─── */
+  #opening {
+    background: var(--bg-start);
+    gap: 1.5rem;
+  }
+
+  .star-field {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .star {
+    position: absolute;
+    border-radius: 50%;
+    background: white;
+    animation: twinkle var(--d, 3s) ease-in-out infinite var(--delay, 0s);
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: var(--min-op, 0.1); transform: scale(1); }
+    50% { opacity: var(--max-op, 0.7); transform: scale(1.3); }
+  }
+
+  .opening-line {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-style: italic;
+    font-size: clamp(1rem, 3vw, 1.35rem);
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 1.4s ease, transform 1.4s ease;
+    max-width: 480px;
+  }
+
+  .opening-line.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .opening-line.delay-1 { transition-delay: 0.3s; }
+  .opening-line.delay-2 { transition-delay: 0.8s; }
+  .opening-line.delay-3 { transition-delay: 1.3s; }
+
+  .section-divider {
+    width: 1px;
+    height: 80px;
+    background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+    margin: 2rem auto;
+    opacity: 0;
+    transition: opacity 1.2s ease 1.8s;
+  }
+  .section-divider.visible { opacity: 0.4; }
+
+  /* ─── CAKE SECTION ─── */
+  #cake-section {
+    background: radial-gradient(ellipse at center bottom, #1a1008 0%, #080c14 70%);
+    gap: 3rem;
+  }
+
+  .cake-title {
+    font-family: 'Jost', sans-serif;
+    font-weight: 200;
+    font-size: clamp(0.7rem, 2vw, 0.85rem);
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 1s ease, transform 1s ease;
+  }
+  .cake-title.visible { opacity: 1; transform: translateY(0); }
+
+  /* ─── CAKE STAGE ─── */
+  .cake-stage {
+    position: relative;
+    width: 280px;
+    height: 320px;
+    overflow: visible;
+  }
+
+  /* PLATE */
+  .plate-group {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%) translateY(-200px);
+    transition: transform 0.8s cubic-bezier(0.25, 1.4, 0.5, 1);
+    opacity: 0;
+  }
+  .plate-group.dropped {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+
+  .plate-ellipse {
+    width: 220px;
+    height: 22px;
+    background: radial-gradient(ellipse at 40% 35%, #d4c4a0, #8a7652);
+    border-radius: 50%;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6), inset 0 2px 4px rgba(255,255,255,0.15);
+  }
+
+  .plate-rim {
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 232px;
+    height: 14px;
+    background: linear-gradient(to bottom, #c8b887, #7a6840);
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+
+  /* CAKE LAYERS */
+  .layer {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%) translateY(-300px);
+    border-radius: 12px 12px 6px 6px;
+    opacity: 0;
+    transition: transform 0.7s cubic-bezier(0.22, 1.4, 0.36, 1), opacity 0.3s ease;
+  }
+
+  .layer.dropped {
+    opacity: 1;
+  }
+
+  .layer-1 {
+    bottom: 14px;
+    width: 200px;
+    height: 64px;
+    background: linear-gradient(to bottom, #c4856a, #9a5e47);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,200,150,0.2);
+  }
+
+  .layer-1::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 12px;
+    background: linear-gradient(to bottom, #d4a080, #c4856a);
+    border-radius: 12px 12px 0 0;
+  }
+
+  .layer-2 {
+    bottom: 72px;
+    width: 164px;
+    height: 54px;
+    background: linear-gradient(to bottom, #8b6b4a, #5e4228);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.5), inset 0 2px 4px rgba(180,130,80,0.2);
+  }
+
+  .layer-2::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 10px;
+    background: linear-gradient(to bottom, #a07848, #8b6b4a);
+    border-radius: 12px 12px 0 0;
+  }
+
+  .layer-3 {
+    bottom: 120px;
+    width: 128px;
+    height: 46px;
+    background: linear-gradient(to bottom, #c9a84c, #8a6a28);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,220,100,0.25);
+  }
+
+  .layer-3::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 9px;
+    background: linear-gradient(to bottom, #e4c060, #c9a84c);
+    border-radius: 12px 12px 0 0;
+  }
+
+  /* Frosting drips on layer 1 */
+  .layer-1::before {
+    content: '';
+    position: absolute;
+    top: -6px; left: 10px; right: 10px;
+    height: 10px;
+    background: radial-gradient(ellipse at 50% 0%, rgba(255,220,190,0.6) 0%, transparent 70%);
+    border-radius: 4px;
+  }
+
+  /* CANDLES */
+  .candle {
+    position: absolute;
+    bottom: 0;
+    width: 8px;
+    background: linear-gradient(to bottom, #f0dfc0, #d4b87a, #b89040);
+    border-radius: 3px 3px 2px 2px;
+    transform-origin: bottom center;
+    transform: scaleY(0);
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .candle.grown { transform: scaleY(1); }
+
+  .candle-1 { left: 28px; height: 32px; }
+  .candle-2 { left: 50%; transform: translateX(-50%) scaleY(0); height: 38px; transform-origin: bottom center; }
+  .candle-2.grown { transform: translateX(-50%) scaleY(1); }
+  .candle-3 { right: 28px; height: 30px; }
+
+  .candle::before {
+    content: '';
+    position: absolute;
+    top: 2px; left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 8px;
+    background: #3a2010;
+    border-radius: 1px;
+  }
+
+  /* FLAMES */
+  .flame-wrap {
+    position: absolute;
+    bottom: calc(100% - 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+
+  .flame-wrap.lit { opacity: 1; }
+
+  .flame {
+    position: relative;
+    width: 10px;
+    height: 18px;
+  }
+
+  .flame-inner {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 12px;
+    background: radial-gradient(ellipse at 50% 80%, #fff5c0, #ffd040, #ff8c20, transparent);
+    border-radius: 50% 50% 35% 35%;
+    animation: flicker 1.8s ease-in-out infinite;
+  }
+
+  .flame-outer {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 10px;
+    height: 18px;
+    background: radial-gradient(ellipse at 50% 70%, rgba(255,140,20,0.6), rgba(255,60,0,0.3), transparent);
+    border-radius: 50% 50% 35% 35%;
+    animation: flicker-outer 2.3s ease-in-out infinite 0.15s;
+  }
+
+  .flame-glow {
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,180,40,0.35), transparent 70%);
+    animation: glow-pulse 1.6s ease-in-out infinite 0.3s;
+  }
+
+  @keyframes flicker {
+    0%   { transform: translateX(-50%) scaleX(1)   scaleY(1)    rotate(0deg);   opacity: 0.95; }
+    20%  { transform: translateX(-50%) scaleX(0.88) scaleY(1.08) rotate(-1.5deg); opacity: 1; }
+    40%  { transform: translateX(-50%) scaleX(1.06) scaleY(0.96) rotate(1deg);   opacity: 0.9; }
+    60%  { transform: translateX(-50%) scaleX(0.92) scaleY(1.05) rotate(-0.5deg); opacity: 1; }
+    80%  { transform: translateX(-50%) scaleX(1.04) scaleY(0.98) rotate(1.5deg); opacity: 0.88; }
+    100% { transform: translateX(-50%) scaleX(1)   scaleY(1)    rotate(0deg);   opacity: 0.95; }
+  }
+
+  @keyframes flicker-outer {
+    0%   { transform: translateX(-50%) scaleX(1)    scaleY(1)    rotate(0deg);   opacity: 0.5; }
+    25%  { transform: translateX(-50%) scaleX(0.82) scaleY(1.1) rotate(2deg);   opacity: 0.65; }
+    50%  { transform: translateX(-50%) scaleX(1.08) scaleY(0.9) rotate(-1deg);  opacity: 0.45; }
+    75%  { transform: translateX(-50%) scaleX(0.9)  scaleY(1.06) rotate(1.5deg); opacity: 0.6; }
+    100% { transform: translateX(-50%) scaleX(1)    scaleY(1)    rotate(0deg);   opacity: 0.5; }
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% { opacity: 0.5; transform: translateX(-50%) scale(1); }
+    50% { opacity: 0.9; transform: translateX(-50%) scale(1.3); }
+  }
+
+  /* Candle layer 3 (top layer) positioning */
+  .layer-3 { position: absolute; }
+  #candle-container {
+    position: absolute;
+    bottom: 155px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 128px;
+    height: 40px;
+  }
+
+  .cake-verse {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(1rem, 2.8vw, 1.2rem);
+    color: var(--text-soft);
+    text-align: center;
+    line-height: 2;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 1.2s ease 0.3s, transform 1.2s ease 0.3s;
+    max-width: 360px;
+  }
+
+  .cake-verse.visible { opacity: 1; transform: translateY(0); }
+
+  /* ─── TREE SECTION ─── */
+  #tree-section {
+    background: linear-gradient(to bottom, #080c14 0%, #0a1008 40%, #0d1510 100%);
+    gap: 2rem;
+    padding-top: 8rem;
+    padding-bottom: 8rem;
+  }
+
+  .tree-container {
+    width: min(560px, 92vw);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
+  }
+
+  #tree-svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  /* Tree path animations */
+  .tree-root {
+    stroke: #5c4020;
+    stroke-width: 3;
+    fill: none;
+    stroke-linecap: round;
+    stroke-dasharray: var(--len, 120);
+    stroke-dashoffset: var(--len, 120);
+    transition: stroke-dashoffset 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .tree-root.drawn { stroke-dashoffset: 0; }
+
+  .tree-trunk {
+    fill: none;
+    stroke: #6b4c2a;
+    stroke-width: 18;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: url(#bark-texture);
+    stroke-dasharray: 260;
+    stroke-dashoffset: 260;
+    transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .tree-trunk.drawn { stroke-dashoffset: 0; }
+
+  .tree-trunk-inner {
+    fill: none;
+    stroke: #8b6a40;
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 240;
+    stroke-dashoffset: 240;
+    transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+  }
+  .tree-trunk-inner.drawn { stroke-dashoffset: 0; }
+
+  .tree-branch {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: var(--blen, 80);
+    stroke-dashoffset: var(--blen, 80);
+    transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .tree-branch.drawn { stroke-dashoffset: 0; }
+
+  .tree-leaf {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  .tree-leaf.visible { opacity: 1; }
+
+  .tree-quote {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(1.05rem, 3vw, 1.3rem);
+    color: var(--text-soft);
+    text-align: center;
+    line-height: 2;
+    letter-spacing: 0.02em;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 1.4s ease, transform 1.4s ease;
+    max-width: 420px;
+  }
+
+  .tree-quote.visible { opacity: 1; transform: translateY(0); }
+
+  .tree-quote em {
+    color: var(--gold);
+    font-style: normal;
+  }
+
+  /* ─── FINAL SECTION ─── */
+  #final-section {
+    background: linear-gradient(to bottom, #0a1008, #140a06, #1a0a08);
+    min-height: 100vh;
+    gap: 0;
+  }
+
+  .final-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.8rem;
+    max-width: 500px;
+    text-align: center;
+  }
+
+  .final-ornament {
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+    opacity: 0;
+    transition: opacity 1.2s ease, width 1.2s ease;
+  }
+  .final-ornament.visible { opacity: 0.5; width: 120px; }
+
+  .final-year {
+    font-family: 'Jost', sans-serif;
+    font-weight: 200;
+    font-size: clamp(4rem, 12vw, 8rem);
+    color: transparent;
+    background: linear-gradient(135deg, #c9a84c, #e8c87a, #a07830);
+    -webkit-background-clip: text;
+    background-clip: text;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    opacity: 0;
+    transform: scale(0.88);
+    transition: opacity 1.5s ease, transform 1.5s cubic-bezier(0.34, 1.2, 0.64, 1);
+  }
+  .final-year.visible { opacity: 1; transform: scale(1); }
+
+  .final-wish {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(1.1rem, 3.2vw, 1.5rem);
+    color: var(--text-full);
+    line-height: 1.9;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 1.4s ease 0.4s, transform 1.4s ease 0.4s;
+  }
+  .final-wish.visible { opacity: 1; transform: translateY(0); }
+
+  .final-close {
+    font-family: 'Jost', sans-serif;
+    font-weight: 200;
+    font-size: clamp(0.65rem, 1.8vw, 0.78rem);
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    opacity: 0;
+    transition: opacity 1.6s ease 0.8s;
+  }
+  .final-close.visible { opacity: 1; }
+
+  /* ─── SCROLL HINT ─── */
+  .scroll-hint {
+    position: absolute;
+    bottom: 3rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0;
+    animation: fade-in-hint 2s ease 3s forwards;
+  }
+
+  .scroll-hint span {
+    font-family: 'Jost', sans-serif;
+    font-weight: 200;
+    font-size: 0.65rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .scroll-hint-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+    animation: scroll-line 2s ease-in-out infinite 3s;
+  }
+
+  @keyframes fade-in-hint {
+    to { opacity: 1; }
+  }
+
+  @keyframes scroll-line {
+    0%, 100% { transform: scaleY(1); opacity: 0.4; }
+    50% { transform: scaleY(0.5); opacity: 0.8; }
+  }
+
+  /* warm bg tint that bleeds in from final section */
+  .bg-warmth {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at bottom center, rgba(60, 20, 5, 0.45), transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 2s ease;
+  }
+
+  #tree-section, #final-section, #cake-section { position: relative; z-index: 1; }
+  #opening { position: relative; z-index: 1; }
+
+</style>
+</head>
+<body>
+
+<div id="progress-line"></div>
+<div class="bg-warmth" id="bg-warmth"></div>
+
+<!-- ═══════════════════ OPENING ═══════════════════ -->
+<section id="opening">
+  <div class="star-field" id="star-field"></div>
+
+  <p class="opening-line delay-1" data-observe="fade">Some things arrive quietly.</p>
+  <p class="opening-line delay-2" data-observe="fade">No announcement. No flourish.</p>
+  <p class="opening-line delay-3" data-observe="fade">Just the fact of another year, present.</p>
+
+  <div class="section-divider" data-observe="fade"></div>
+
+  <div class="scroll-hint">
+    <span>scroll</span>
+    <div class="scroll-hint-line"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════ CAKE SECTION ═══════════════════ -->
+<section id="cake-section">
+  <p class="cake-title" data-observe="fade">a small ceremony</p>
+
+  <div class="cake-stage" id="cake-stage">
+
+    <!-- Plate -->
+    <div class="plate-group" id="plate">
+      <div class="plate-rim"></div>
+      <div class="plate-ellipse"></div>
+    </div>
+
+    <!-- Layer 1 (bottom) -->
+    <div class="layer layer-1" id="cake-layer-1"></div>
+
+    <!-- Layer 2 (middle) -->
+    <div class="layer layer-2" id="cake-layer-2"></div>
+
+    <!-- Layer 3 (top) -->
+    <div class="layer layer-3" id="cake-layer-3"></div>
+
+    <!-- Candle container sits on top layer -->
+    <div id="candle-container">
+
+      <div class="candle candle-1" id="candle-1">
+        <div class="flame-wrap" id="flame-1">
+          <div class="flame">
+            <div class="flame-glow"></div>
+            <div class="flame-outer"></div>
+            <div class="flame-inner"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="candle candle-2" id="candle-2">
+        <div class="flame-wrap" id="flame-2">
+          <div class="flame">
+            <div class="flame-glow"></div>
+            <div class="flame-outer"></div>
+            <div class="flame-inner"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="candle candle-3" id="candle-3">
+        <div class="flame-wrap" id="flame-3">
+          <div class="flame">
+            <div class="flame-glow"></div>
+            <div class="flame-outer"></div>
+            <div class="flame-inner"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="cake-verse" data-observe="fade">
+    A year ended.<br>
+    Another opened its door.<br>
+    You walked through, as you always do.
+  </p>
+</section>
+
+<!-- ═══════════════════ TREE SECTION ═══════════════════ -->
+<section id="tree-section">
+  <div class="tree-container">
+
+    <svg id="tree-svg" viewBox="0 0 560 520" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="bark-texture" x="-10%" y="-10%" width="120%" height="120%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.04 0.1" numOctaves="3" seed="5"/>
+          <feColorMatrix type="saturate" values="0"/>
+          <feBlend in="SourceGraphic" mode="multiply"/>
+        </filter>
+        <radialGradient id="leaf-grad-1" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#4a8c3f"/>
+          <stop offset="100%" stop-color="#2a5c22"/>
+        </radialGradient>
+        <radialGradient id="leaf-grad-2" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#5aa048"/>
+          <stop offset="100%" stop-color="#3a7030"/>
+        </radialGradient>
+        <radialGradient id="leaf-grad-3" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#3d7834"/>
+          <stop offset="100%" stop-color="#1e4a18"/>
+        </radialGradient>
+        <radialGradient id="leaf-grad-4" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#639954"/>
+          <stop offset="100%" stop-color="#3e7034"/>
+        </radialGradient>
+        <radialGradient id="grass-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#2a4a1e"/>
+          <stop offset="100%" stop-color="#1a3010"/>
+        </radialGradient>
+      </defs>
+
+      <!-- GROUND -->
+      <ellipse cx="280" cy="500" rx="180" ry="16" fill="url(#grass-grad)" opacity="0.6"/>
+
+      <!-- ROOTS (drawn first) -->
+      <path class="tree-root" id="root-1" style="--len:110" d="M 258 488 Q 230 490 200 500" />
+      <path class="tree-root" id="root-2" style="--len:100" d="M 262 490 Q 240 496 220 508" stroke-width="2.5"/>
+      <path class="tree-root" id="root-3" style="--len:90"  d="M 270 492 Q 258 498 248 510" stroke-width="2"/>
+      <path class="tree-root" id="root-4" style="--len:110" d="M 282 488 Q 310 490 338 502" />
+      <path class="tree-root" id="root-5" style="--len:100" d="M 278 490 Q 302 496 320 508" stroke-width="2.5"/>
+      <path class="tree-root" id="root-6" style="--len:80"  d="M 272 492 Q 285 498 295 510" stroke-width="2"/>
+
+      <!-- TRUNK -->
+      <path class="tree-trunk" id="trunk" d="M 270 488 Q 264 440 268 380 Q 272 310 270 250 Q 268 200 272 160"/>
+      <path class="tree-trunk-inner" id="trunk-inner" d="M 276 488 Q 270 440 274 380 Q 278 310 276 250 Q 274 200 278 160" stroke-width="4"/>
+
+      <!-- BRANCHES — 26 branches in total, varied -->
+      <!-- Major left branches -->
+      <path class="tree-branch" id="b1"  style="--blen:140" stroke="#6b4c2a" stroke-width="7"  d="M 270 380 Q 230 350 175 320 Q 145 305 110 300"/>
+      <path class="tree-branch" id="b2"  style="--blen:120" stroke="#7a5835" stroke-width="5"  d="M 268 340 Q 235 318 200 295 Q 175 280 150 268"/>
+      <path class="tree-branch" id="b3"  style="--blen:100" stroke="#7a5835" stroke-width="4"  d="M 272 300 Q 245 282 215 265 Q 192 252 168 244"/>
+      <path class="tree-branch" id="b4"  style="--blen:90"  stroke="#8a6840" stroke-width="3.5"d="M 270 260 Q 248 242 225 228 Q 205 216 182 210"/>
+      <path class="tree-branch" id="b5"  style="--blen:80"  stroke="#8a6840" stroke-width="3"  d="M 272 225 Q 252 210 232 198 Q 215 188 195 184"/>
+      <!-- Major right branches -->
+      <path class="tree-branch" id="b6"  style="--blen:145" stroke="#6b4c2a" stroke-width="7"  d="M 270 370 Q 312 340 360 312 Q 395 292 430 285"/>
+      <path class="tree-branch" id="b7"  style="--blen:125" stroke="#7a5835" stroke-width="5"  d="M 272 328 Q 308 306 345 288 Q 372 274 400 265"/>
+      <path class="tree-branch" id="b8"  style="--blen:105" stroke="#7a5835" stroke-width="4"  d="M 272 292 Q 300 272 328 258 Q 350 245 375 238"/>
+      <path class="tree-branch" id="b9"  style="--blen:88"  stroke="#8a6840" stroke-width="3.5"d="M 271 255 Q 296 238 320 226 Q 340 215 362 210"/>
+      <path class="tree-branch" id="b10" style="--blen:78"  stroke="#8a6840" stroke-width="3"  d="M 273 222 Q 295 208 318 196 Q 336 186 355 182"/>
+      <!-- Upper spread -->
+      <path class="tree-branch" id="b11" style="--blen:90"  stroke="#8a6840" stroke-width="3"  d="M 272 195 Q 255 180 235 165 Q 218 153 198 145"/>
+      <path class="tree-branch" id="b12" style="--blen:85"  stroke="#8a6840" stroke-width="3"  d="M 272 195 Q 292 178 312 165 Q 330 153 348 148"/>
+      <path class="tree-branch" id="b13" style="--blen:70"  stroke="#967848" stroke-width="2.5"d="M 272 175 Q 265 158 252 142 Q 241 130 228 122"/>
+      <path class="tree-branch" id="b14" style="--blen:70"  stroke="#967848" stroke-width="2.5"d="M 273 175 Q 282 157 296 142 Q 308 130 322 122"/>
+      <path class="tree-branch" id="b15" style="--blen:60"  stroke="#967848" stroke-width="2.5"d="M 271 165 Q 262 148 248 135 Q 236 124 222 118"/>
+      <!-- Sub-branches off major left -->
+      <path class="tree-branch" id="b16" style="--blen:65"  stroke="#967848" stroke-width="2"  d="M 175 320 Q 158 300 138 285 Q 122 272 105 266"/>
+      <path class="tree-branch" id="b17" style="--blen:55"  stroke="#a08050" stroke-width="2"  d="M 150 268 Q 132 252 112 240 Q 98 230 82 226"/>
+      <path class="tree-branch" id="b18" style="--blen:50"  stroke="#a08050" stroke-width="1.5"d="M 182 210 Q 165 196 148 185 Q 133 175 118 172"/>
+      <!-- Sub-branches off major right -->
+      <path class="tree-branch" id="b19" style="--blen:65"  stroke="#967848" stroke-width="2"  d="M 430 285 Q 448 268 462 250 Q 473 236 482 225"/>
+      <path class="tree-branch" id="b20" style="--blen:55"  stroke="#a08050" stroke-width="2"  d="M 400 265 Q 420 248 436 232 Q 448 219 458 210"/>
+      <path class="tree-branch" id="b21" style="--blen:50"  stroke="#a08050" stroke-width="1.5"d="M 362 210 Q 378 194 390 180 Q 400 168 408 158"/>
+      <!-- Fine upper twigs -->
+      <path class="tree-branch" id="b22" style="--blen:45"  stroke="#a08050" stroke-width="1.5"d="M 228 122 Q 218 106 208 90 Q 200 77 194 68"/>
+      <path class="tree-branch" id="b23" style="--blen:45"  stroke="#a08050" stroke-width="1.5"d="M 322 122 Q 334 106 344 90 Q 352 77 357 68"/>
+      <path class="tree-branch" id="b24" style="--blen:40"  stroke="#a08050" stroke-width="1.5"d="M 198 145 Q 185 128 174 114 Q 165 102 158 95"/>
+      <path class="tree-branch" id="b25" style="--blen:40"  stroke="#a08050" stroke-width="1.5"d="M 348 148 Q 362 130 372 116 Q 380 104 388 96"/>
+      <path class="tree-branch" id="b26" style="--blen:35"  stroke="#b09060" stroke-width="1"  d="M 271 160 Q 272 142 272 126 Q 272 115 273 105"/>
+
+      <!-- ─── LEAVES (many ellipses and circles grouped) ─── -->
+      <!-- Left canopy cluster -->
+      <g id="leaves-left-low">
+        <ellipse class="tree-leaf" cx="112" cy="290" rx="42" ry="30" fill="url(#leaf-grad-1)" opacity="0.92"/>
+        <ellipse class="tree-leaf" cx="88"  cy="278" rx="35" ry="24" fill="url(#leaf-grad-3)" opacity="0.88"/>
+        <ellipse class="tree-leaf" cx="138" cy="270" rx="38" ry="26" fill="url(#leaf-grad-2)" opacity="0.9"/>
+        <ellipse class="tree-leaf" cx="105" cy="258" rx="30" ry="22" fill="url(#leaf-grad-4)" opacity="0.85"/>
+        <ellipse class="tree-leaf" cx="162" cy="296" rx="32" ry="22" fill="url(#leaf-grad-1)" opacity="0.87"/>
+      </g>
+      <g id="leaves-left-mid">
+        <ellipse class="tree-leaf" cx="82"  cy="228" rx="38" ry="26" fill="url(#leaf-grad-2)" opacity="0.9"/>
+        <ellipse class="tree-leaf" cx="60"  cy="218" rx="30" ry="20" fill="url(#leaf-grad-3)" opacity="0.85"/>
+        <ellipse class="tree-leaf" cx="110" cy="214" rx="34" ry="24" fill="url(#leaf-grad-4)" opacity="0.88"/>
+        <ellipse class="tree-leaf" cx="90"  cy="200" rx="28" ry="20" fill="url(#leaf-grad-1)" opacity="0.84"/>
+        <ellipse class="tree-leaf" cx="128" cy="200" rx="30" ry="21" fill="url(#leaf-grad-3)" opacity="0.86"/>
+      </g>
+      <g id="leaves-left-up">
+        <ellipse class="tree-leaf" cx="118" cy="170" rx="36" ry="26" fill="url(#leaf-grad-1)" opacity="0.9"/>
+        <ellipse class="tree-leaf" cx="96"  cy="158" rx="30" ry="22" fill="url(#leaf-grad-2)" opacity="0.86"/>
+        <ellipse class="tree-leaf" cx="144" cy="155" rx="32" ry="23" fill="url(#leaf-grad-4)" opacity="0.88"/>
+        <ellipse class="tree-leaf" cx="168" cy="162" rx="28" ry="20" fill="url(#leaf-grad-3)" opacity="0.84"/>
+      </g>
+
+      <!-- Right canopy cluster -->
+      <g id="leaves-right-low">
+        <ellipse class="tree-leaf" cx="448" cy="278" rx="42" ry="30" fill="url(#leaf-grad-1)" opacity="0.9"/>
+        <ellipse class="tree-leaf" cx="474" cy="266" rx="34" ry="24" fill="url(#leaf-grad-3)" opacity="0.87"/>
+        <ellipse class="tree-leaf" cx="422" cy="264" rx="36" ry="25" fill="url(#leaf-grad-2)" opacity="0.9"/>
+        <ellipse class="tree-leaf" cx="454" cy="252" rx="30" ry="21" fill="url(#leaf-grad-4)" opacity="0.85"/>
+        <ellipse class="tree-leaf" cx="400" cy="272" rx="30" ry="21" fill="url(#leaf-grad-1)" opacity="0.87"/>
+      </g>
+      <g id="leaves-right-mid">
+        <ellipse class="tree-leaf" cx="460" cy="212" rx="36" ry="26" fill="url(#leaf-grad-2)" opacity="0.9"/>
+        <ellipse class="tree-leaf" cx="482" cy="200" rx="28" ry="20" fill="url(#leaf-grad-3)" opacity="0.85"/>
+        <ellipse class="tree-leaf" cx="436" cy="196" rx="34" ry="23" fill="url(#leaf-grad-4)" opacity="0.88"/>
+        <ellipse class="tree-leaf" cx="408" cy="200" rx="28" ry="20" fill="url(#leaf-grad-1)" opacity="0.84"/>
+        <ellipse class="tree-leaf" cx="420" cy="180" rx="26" ry="18" fill="url(#leaf-grad-3)" opacity="0.82"/>
+      </g>
+      <g id="leaves-right-up">
+        <ellipse class="tree-leaf" cx="410" cy="158" rx="34" ry="25" fill="url(#leaf-grad-1)" opacity="0.9"/>
+        <ellipse class="tree-leaf" cx="388" cy="148" rx="30" ry="22" fill="url(#leaf-grad-2)" opacity="0.86"/>
+        <ellipse class="tree-leaf" cx="436" cy="144" rx="28" ry="20" fill="url(#leaf-grad-4)" opacity="0.88"/>
+        <ellipse class="tree-leaf" cx="456" cy="152" rx="26" ry="18" fill="url(#leaf-grad-3)" opacity="0.83"/>
+      </g>
+
+      <!-- Center canopy (top) -->
+      <g id="leaves-center-up">
+        <ellipse class="tree-leaf" cx="228" cy="108" rx="38" ry="28" fill="url(#leaf-grad-1)" opacity="0.92"/>
+        <ellipse class="tree-leaf" cx="255" cy="96"  rx="34" ry="25" fill="url(#leaf-grad-4)" opacity="0.9"/>
+        <ellipse class="tree-leaf" cx="202" cy="96"  rx="30" ry="22" fill="url(#leaf-grad-2)" opacity="0.88"/>
+        <ellipse class="tree-leaf" cx="272" cy="88"  rx="36" ry="28" fill="url(#leaf-grad-3)" opacity="0.92"/>
+        <ellipse class="tree-leaf" cx="300" cy="96"  rx="34" ry="24" fill="url(#leaf-grad-1)" opacity="0.9"/>
+        <ellipse class="tree-leaf" cx="324" cy="108" rx="36" ry="27" fill="url(#leaf-grad-4)" opacity="0.9"/>
+        <ellipse class="tree-leaf" cx="350" cy="102" rx="30" ry="22" fill="url(#leaf-grad-2)" opacity="0.87"/>
+        <ellipse class="tree-leaf" cx="272" cy="70"  rx="28" ry="22" fill="url(#leaf-grad-3)" opacity="0.88"/>
+        <ellipse class="tree-leaf" cx="250" cy="72"  rx="24" ry="18" fill="url(#leaf-grad-4)" opacity="0.84"/>
+        <ellipse class="tree-leaf" cx="295" cy="72"  rx="25" ry="19" fill="url(#leaf-grad-1)" opacity="0.85"/>
+      </g>
+
+      <!-- Center mid -->
+      <g id="leaves-center-mid">
+        <ellipse class="tree-leaf" cx="200" cy="140" rx="38" ry="28" fill="url(#leaf-grad-2)" opacity="0.9"/>
+        <ellipse class="tree-leaf" cx="235" cy="128" rx="34" ry="24" fill="url(#leaf-grad-1)" opacity="0.88"/>
+        <ellipse class="tree-leaf" cx="310" cy="128" rx="34" ry="24" fill="url(#leaf-grad-3)" opacity="0.88"/>
+        <ellipse class="tree-leaf" cx="345" cy="138" rx="36" ry="26" fill="url(#leaf-grad-4)" opacity="0.9"/>
+        <ellipse class="tree-leaf" cx="270" cy="118" rx="30" ry="22" fill="url(#leaf-grad-1)" opacity="0.87"/>
+        <ellipse class="tree-leaf" cx="178" cy="152" rx="32" ry="22" fill="url(#leaf-grad-3)" opacity="0.86"/>
+        <ellipse class="tree-leaf" cx="362" cy="148" rx="30" ry="21" fill="url(#leaf-grad-2)" opacity="0.86"/>
+      </g>
+
+      <!-- Mid spread fill -->
+      <g id="leaves-mid-spread">
+        <ellipse class="tree-leaf" cx="155" cy="248" rx="36" ry="26" fill="url(#leaf-grad-4)" opacity="0.88"/>
+        <ellipse class="tree-leaf" cx="178" cy="232" rx="32" ry="22" fill="url(#leaf-grad-1)" opacity="0.86"/>
+        <ellipse class="tree-leaf" cx="140" cy="228" rx="28" ry="20" fill="url(#leaf-grad-3)" opacity="0.84"/>
+        <ellipse class="tree-leaf" cx="388" cy="244" rx="34" ry="25" fill="url(#leaf-grad-2)" opacity="0.88"/>
+        <ellipse class="tree-leaf" cx="365" cy="228" rx="30" ry="22" fill="url(#leaf-grad-4)" opacity="0.86"/>
+        <ellipse class="tree-leaf" cx="408" cy="228" rx="28" ry="20" fill="url(#leaf-grad-1)" opacity="0.84"/>
+        <!-- Connecting fill -->
+        <ellipse class="tree-leaf" cx="215" cy="178" rx="34" ry="24" fill="url(#leaf-grad-2)" opacity="0.87"/>
+        <ellipse class="tree-leaf" cx="330" cy="176" rx="34" ry="24" fill="url(#leaf-grad-3)" opacity="0.87"/>
+        <ellipse class="tree-leaf" cx="245" cy="158" rx="30" ry="22" fill="url(#leaf-grad-4)" opacity="0.85"/>
+        <ellipse class="tree-leaf" cx="300" cy="156" rx="32" ry="23" fill="url(#leaf-grad-1)" opacity="0.86"/>
+      </g>
+
+    </svg>
+
+    <p class="tree-quote" id="tree-quote">
+      The roots you cannot see<br>
+      hold everything you can.<br>
+      <em>Grow in whatever direction<br>the light asks of you.</em>
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════ FINAL SECTION ═══════════════════ -->
+<section id="final-section">
+  <div class="final-inner">
+    <div class="final-ornament" data-observe="final"></div>
+
+    <div class="final-year" data-observe="final" style="transition-delay:0.2s">
+      Another Year
+    </div>
+
+    <p class="final-wish" data-observe="final" style="transition-delay:0.5s">
+      May it carry less weight<br>
+      than the ones before it.<br>
+      May something unexpected<br>
+      turn out to be exactly right.
+    </p>
+
+    <p class="final-close" data-observe="final" style="transition-delay:0.9s">
+      happy birthday
+    </p>
+
+    <div class="final-ornament" data-observe="final" style="transition-delay:1.1s"></div>
+  </div>
+</section>
+
+<script>
+// ─── STARS ───────────────────────────────────────────────
+(function generateStars() {
+  const field = document.getElementById('star-field');
+  const count = 120;
+  for (let i = 0; i < count; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    const size = Math.random() * 2 + 0.5;
+    star.style.cssText = `
+      width: ${size}px;
+      height: ${size}px;
+      top: ${Math.random() * 100}%;
+      left: ${Math.random() * 100}%;
+      --d: ${2 + Math.random() * 4}s;
+      --delay: ${-Math.random() * 6}s;
+      --min-op: ${0.05 + Math.random() * 0.15};
+      --max-op: ${0.4 + Math.random() * 0.5};
+    `;
+    field.appendChild(star);
+  }
+})();
+
+// ─── PROGRESS LINE ────────────────────────────────────────
+const progressLine = document.getElementById('progress-line');
+window.addEventListener('scroll', () => {
+  const scrollTop = window.scrollY;
+  const docHeight = document.body.scrollHeight - window.innerHeight;
+  const pct = Math.min(100, (scrollTop / docHeight) * 100);
+  progressLine.style.width = pct + '%';
+
+  // warm bg tint
+  const warmth = Math.max(0, (pct - 55) / 45);
+  document.getElementById('bg-warmth').style.opacity = warmth;
+}, { passive: true });
+
+// ─── GENERAL FADE OBSERVER ────────────────────────────────
+const fadeObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.25 });
+
+document.querySelectorAll('[data-observe="fade"]').forEach(el => fadeObs.observe(el));
+
+// ─── FINAL SECTION OBSERVER ───────────────────────────────
+const finalObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.2 });
+
+document.querySelectorAll('[data-observe="final"]').forEach(el => finalObs.observe(el));
+
+// ─── CAKE ANIMATION ──────────────────────────────────────
+let cakeAnimated = false;
+const cakeObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting && !cakeAnimated) {
+      cakeAnimated = true;
+      runCakeSequence();
+      cakeObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.3 });
+
+cakeObs.observe(document.getElementById('cake-stage'));
+
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function runCakeSequence() {
+  // 1. Plate drops
+  await delay(200);
+  const plate = document.getElementById('plate');
+  plate.style.transition = 'transform 0.85s cubic-bezier(0.25, 1.4, 0.5, 1), opacity 0.3s ease';
+  plate.classList.add('dropped');
+
+  // 2. Layer 1
+  await delay(700);
+  const l1 = document.getElementById('cake-layer-1');
+  l1.classList.add('dropped');
+  l1.style.transform = 'translateX(-50%) translateY(0)';
+
+  // 3. Layer 2
+  await delay(500);
+  const l2 = document.getElementById('cake-layer-2');
+  l2.classList.add('dropped');
+  l2.style.transform = 'translateX(-50%) translateY(0)';
+
+  // 4. Layer 3
+  await delay(500);
+  const l3 = document.getElementById('cake-layer-3');
+  l3.classList.add('dropped');
+  l3.style.transform = 'translateX(-50%) translateY(0)';
+
+  // 5. Candles grow upward
+  await delay(600);
+  document.getElementById('candle-1').classList.add('grown');
+  await delay(500);
+  document.getElementById('candle-2').classList.add('grown');
+  await delay(500);
+  document.getElementById('candle-3').classList.add('grown');
+
+  // 6. Flames light up
+  await delay(400);
+  document.getElementById('flame-1').classList.add('lit');
+  await delay(300);
+  document.getElementById('flame-2').classList.add('lit');
+  await delay(300);
+  document.getElementById('flame-3').classList.add('lit');
+}
+
+// Set initial transform for layers (translateX but also Y offscreen)
+['cake-layer-1','cake-layer-2','cake-layer-3'].forEach(id => {
+  const el = document.getElementById(id);
+  el.style.transform = 'translateX(-50%) translateY(-300px)';
+  el.style.transition = 'transform 0.72s cubic-bezier(0.22, 1.4, 0.36, 1), opacity 0.3s ease';
+});
+
+// ─── TREE ANIMATION ──────────────────────────────────────
+let treeAnimated = false;
+const treeObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting && !treeAnimated) {
+      treeAnimated = true;
+      runTreeSequence();
+      treeObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.15 });
+
+treeObs.observe(document.getElementById('tree-section'));
+
+async function runTreeSequence() {
+  // 1. Roots
+  const roots = document.querySelectorAll('.tree-root');
+  roots.forEach((r, i) => {
+    setTimeout(() => r.classList.add('drawn'), i * 180);
+  });
+
+  // 2. Trunk
+  await delay(900);
+  document.getElementById('trunk').classList.add('drawn');
+  document.getElementById('trunk-inner').classList.add('drawn');
+
+  // 3. Branches one by one
+  await delay(1000);
+  const branches = document.querySelectorAll('.tree-branch');
+  for (let i = 0; i < branches.length; i++) {
+    setTimeout(() => branches[i].classList.add('drawn'), i * 130);
+  }
+
+  // 4. Leaves after branches
+  const branchTime = branches.length * 130 + 300;
+  await delay(branchTime);
+
+  const leafGroups = [
+    'leaves-left-low', 'leaves-right-low',
+    'leaves-left-mid', 'leaves-right-mid',
+    'leaves-center-mid', 'leaves-mid-spread',
+    'leaves-left-up', 'leaves-right-up',
+    'leaves-center-up'
+  ];
+
+  for (let g = 0; g < leafGroups.length; g++) {
+    await delay(220);
+    const group = document.getElementById(leafGroups[g]);
+    if (!group) continue;
+    const leaves = group.querySelectorAll('.tree-leaf');
+    leaves.forEach((leaf, li) => {
+      setTimeout(() => leaf.classList.add('visible'), li * 40);
+    });
+  }
+
+  // 5. Quote
+  await delay(1000);
+  document.getElementById('tree-quote').classList.add('visible');
+}
+
+// Measure branch path lengths (approximate via style vars already set)
+// We set them via CSS custom properties --blen directly, so no JS needed.
+
+</script>
+</body>
+</html>
