@@ -15,7 +15,7 @@
       --t1: rgba(238, 228, 208, 0.94);
       --t2: rgba(238, 228, 208, 0.72);
       --t3: rgba(238, 228, 208, 0.46);
-      --t4: rgba(238, 228, 208, 0.28);
+      --t4: rgba(247, 214, 149, 0.918);
 
       /* Flip card — matching reference exactly */
       --fc-w: clamp(52px, 10vw, 72px);
@@ -124,6 +124,7 @@
       font-weight: 200;
       font-size: clamp(0.58rem, 1.3vw, 0.68rem);
       letter-spacing: 0.46em;
+      text-align: center;
       text-transform: uppercase;
       color: var(--t4);
       margin-bottom: 2.8rem;
@@ -136,6 +137,20 @@
     }
 
     /* ── Clock row ── */
+
+    #flip-clock {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    #flip-clock .fc-group {
+      display: flex;
+      align-items: center;
+    }
+
     .flip-clock {
       display: flex;
       align-items: flex-end;
@@ -166,14 +181,17 @@
     /* ── Single digit card ── */
     .fc {
       position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       width: var(--fc-w);
       height: var(--fc-h);
       border-radius: var(--fc-r);
       /* depth shadow behind the card */
+      background: linear-gradient(180deg, #1a2233, #0f1724);
       box-shadow:
-        0 4px 0 var(--fc-edge),
-        0 6px 20px rgba(0, 0, 0, 0.65),
-        0 2px 6px rgba(0, 0, 0, 0.5);
+        0 8px 20px rgba(0, 0, 0, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
       overflow: hidden;
       /* clip the seam children */
       /* perspective on each card individually */
@@ -190,21 +208,23 @@
       height: 50%;
       background: var(--fc-bot);
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: center;
       overflow: hidden;
       /* inset shadow at top of bottom half = seam depth */
       box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+      z-index: 1;
     }
 
     .fc-bottom-num {
       /* pull the number up so it centres across the full card */
       margin-top: calc(-1 * var(--fc-h) / 2);
       font-family: var(--fc-font);
-      font-weight: 300;
       font-size: var(--fc-num);
-      color: rgba(255, 255, 255, 0.72);
-      letter-spacing: -0.04em;
+      color: #f5f7fa;
+      /* Bright readable */
+      font-weight: 600;
+      letter-spacing: 0.5px;
       line-height: 1;
       user-select: none;
       white-space: nowrap;
@@ -219,22 +239,25 @@
       height: 50%;
       background: var(--fc-top);
       display: flex;
-      align-items: flex-end;
+      align-items: center;
       justify-content: center;
       overflow: hidden;
       /* highlight at top edge */
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+      z-index: 2;
     }
 
     .fc-top-num {
       /* pull number down so it centres across full card */
       margin-bottom: calc(-1 * var(--fc-h) / 2);
       font-family: var(--fc-font);
-      font-weight: 300;
       font-size: var(--fc-num);
-      color: rgba(255, 255, 255, 0.96);
-      letter-spacing: -0.04em;
+      color: #f5f7fa;
+      /* Bright readable */
+      font-weight: 600;
+      letter-spacing: 0.5px;
       line-height: 1;
+      /* opacity: 0; */
       user-select: none;
       white-space: nowrap;
     }
@@ -266,7 +289,7 @@
       height: 50%;
       background: var(--fc-top);
       display: flex;
-      align-items: flex-end;
+      align-items: center;
       justify-content: center;
       overflow: hidden;
       transform-origin: center bottom;
@@ -280,10 +303,11 @@
     .fc-flap-num {
       margin-bottom: calc(-1 * var(--fc-h) / 2);
       font-family: var(--fc-font);
-      font-weight: 300;
       font-size: var(--fc-num);
-      color: rgba(255, 255, 255, 0.96);
-      letter-spacing: -0.04em;
+      color: #f5f7fa;
+      /* Bright readable */
+      font-weight: 600;
+      letter-spacing: 0.5px;
       line-height: 1;
       user-select: none;
       white-space: nowrap;
@@ -309,7 +333,7 @@
       height: 50%;
       background: var(--fc-bot);
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: center;
       overflow: hidden;
       transform-origin: center top;
@@ -324,10 +348,11 @@
     .fc-rise-num {
       margin-top: calc(-1 * var(--fc-h) / 2);
       font-family: var(--fc-font);
-      font-weight: 300;
       font-size: var(--fc-num);
-      color: rgba(255, 255, 255, 0.72);
-      letter-spacing: -0.04em;
+      color: #f5f7fa;
+      /* Bright readable */
+      font-weight: 600;
+      letter-spacing: 0.5px;
       line-height: 1;
       user-select: none;
       white-space: nowrap;
@@ -397,7 +422,9 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: clamp(6px, 1.5vw, 10px);
+      /* gap: clamp(6px, 1.5vw, 10px); */
+      gap: 8px;
+      margin: 0 6px;
       height: var(--fc-h);
       padding-bottom: 20px;
       /* align with card centre visually */
@@ -1162,7 +1189,7 @@
   <section id="countdown-section">
     <div class="star-field" id="star-field"></div>
 
-    <p class="clock-eyebrow" id="clock-eyebrow">time already lived</p>
+    <p class="clock-eyebrow" id="clock-eyebrow">From First Breath to This Moment <br> its been</p>
 
     <!--
     Layout: [D1][D2][D3][D4] : [H1][H2] : [M1][M2] : [S1][S2]
@@ -1725,40 +1752,45 @@
     // Flip one digit slot from its current value to newCh
     function flipSlot(id, newCh) {
       if (busy[id]) return;
+
       const oldCh = cur[id];
       if (oldCh === newCh) return;
-      busy[id] = true;
-      cur[id] = newCh;
 
-      const tn = document.getElementById('tn-' + id); // top-half static num
-      const bn = document.getElementById('bn-' + id); // bottom-half static num
-      const fn = document.getElementById('fn-' + id); // flap num (old)
-      const rn = document.getElementById('rn-' + id); // rise num (new)
+      busy[id] = true;
+
+      const tn = document.getElementById('tn-' + id);
+      const bn = document.getElementById('bn-' + id);
+      const fn = document.getElementById('fn-' + id);
+      const rn = document.getElementById('rn-' + id);
       const flapEl = document.getElementById('fc-' + id).querySelector('.fc-flap');
       const riseEl = document.getElementById('fc-' + id).querySelector('.fc-rise');
 
-      // Prepare: flap shows OLD, rise shows NEW, static panels already show NEW (hidden behind)
+      // Prepare layers
       fn.textContent = oldCh;
       rn.textContent = newCh;
-      tn.textContent = newCh;
-      bn.textContent = newCh;
+      tn.textContent = oldCh;
+      bn.textContent = oldCh;
 
-      // Reset state cleanly before animating
       flapEl.classList.remove('flip-fall');
       riseEl.classList.remove('flip-rise');
-      // Force reflow so removal takes effect before re-adding
       void flapEl.offsetHeight;
 
-      // GO
       flapEl.classList.add('flip-fall');
       riseEl.classList.add('flip-rise');
 
-      // Cleanup after full animation (0.25s fall + 0.25s delay + 0.25s rise = 0.75s)
+      // 🔥 MIDPOINT UPDATE (after flap fold ~250ms)
       setTimeout(() => {
-        flapEl.classList.remove('flip-fall');
+        tn.textContent = newCh;
+        bn.textContent = newCh;
+      }, 260); // slightly after 0.25s
+
+      // CLEANUP
+      setTimeout(() => {
+        cur[id] = newCh;
+        // flapEl.classList.remove('flip-fall');
         riseEl.classList.remove('flip-rise');
         busy[id] = false;
-      }, 800);
+      }, 750);
     }
 
     function tick() {
