@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>یہاں</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Noto+Nastaliq+Urdu:wght@400;500&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0f11;
+    --surface: #13151a;
+    --surface2: #191c22;
+    --border: #232730;
+    --accent: #7ae4b6;
+    --accent-dim: rgba(124,158,143,0.12);
+    --accent-mid: rgba(124,158,143,0.3);
+    --text-primary: #cfd4dc;
+    --text-secondary: #8a919e;
+    --text-dim: #9ca3ae;
+    --text-urdu: #b8c4b0;
+    --panel-bg: #0c0e12;
+  }
+
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Subtle grain overlay */
+  body::before {
+    content:'';
+    position:fixed;
+    inset:0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.4;
+    pointer-events:none;
+    z-index:9999;
+  }
+
+  /* HOME SCREEN */
+  #home {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px 80px;
+    opacity: 0;
+    animation: fadeIn 2s ease forwards;
+    animation-delay: 0.3s;
+  }
+
+  .home-header {
+    text-align: center;
+    margin-bottom: 64px;
+  }
+
+  .home-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 6vw, 3.8rem);
+    font-weight: 300;
+    letter-spacing: 0.04em;
+    color: var(--text-primary);
+    line-height: 1.2;
+    margin-bottom: 18px;
+  }
+
+  .home-subtitle {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 300;
+  }
+
+  .home-line {
+    width: 40px;
+    height: 1px;
+    background: var(--accent);
+    opacity: 0.4;
+    margin: 24px auto 0;
+  }
+
+  /* EMOTION GRID */
+  .emotions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    max-width: 860px;
+    width: 100%;
+  }
+
+  .emotion-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 16px 20px;
+    font-family: 'Lato', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .emotion-btn::before {
+    content:'';
+    position:absolute;
+    left:0; top:0; bottom:0;
+    width:2px;
+    background: var(--accent);
+    transform: scaleY(0);
+    transition: transform 0.4s ease;
+    transform-origin: bottom;
+  }
+
+  .emotion-btn:hover {
+    background: var(--surface2);
+    color: var(--text-primary);
+    border-color: var(--accent-mid);
+  }
+
+  .emotion-btn:hover::before { transform: scaleY(1); }
+
+  .emotion-btn .en { display:block; margin-bottom: 4px; }
+  .emotion-btn .ur {
+    display:block;
+    font-family: 'Noto Nastaliq Urdu', serif;
+    font-size: 0.72rem;
+    color: var(--accent);
+    opacity: 0.6;
+    direction: rtl;
+  }
+
+  /* PANEL */
+  #panel {
+    position: fixed;
+    inset: 0;
+    background: var(--panel-bg);
+    z-index: 100;
+    transform: translateY(100%);
+    transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #panel.open {
+    transform: translateY(0);
+  }
+
+  .panel-inner {
+    max-width: 740px;
+    margin: 0 auto;
+    padding: 80px 32px 120px;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    transition-delay: 0.3s;
+  }
+
+  #panel.open .panel-inner { opacity: 1; }
+
+  /* BACK BTN */
+  .back-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-family: 'Lato', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 300;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 60px;
+    padding: 0;
+    transition: color 0.3s ease;
+  }
+
+  .back-btn:hover { color: var(--accent); }
+
+  .back-btn svg {
+    width: 16px; height: 16px;
+    transition: transform 0.3s ease;
+  }
+
+  .back-btn:hover svg { transform: translateX(-3px); }
+
+  /* EMOTION HEADER */
+  .emotion-header {
+    margin-bottom: 72px;
+  }
+
+  .emotion-title-en {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.4rem, 7vw, 4.2rem);
+    font-weight: 300;
+    font-style: italic;
+    color: var(--text-primary);
+    line-height: 1.1;
+    letter-spacing: 0.01em;
+    margin-bottom: 12px;
+  }
+
+  .emotion-title-ur {
+    font-family: 'Noto Nastaliq Urdu', serif;
+    font-size: 1.3rem;
+    color: var(--accent);
+    opacity: 0.5;
+    direction: rtl;
+    text-align: right;
+  }
+
+  .section-divider {
+    width: 100%;
+    height: 1px;
+    background: var(--border);
+    margin: 52px 0;
+    position: relative;
+  }
+
+  .section-divider::after {
+    content:'';
+    position:absolute;
+    left:0; top:0;
+    width: 48px; height:1px;
+    background: var(--accent);
+    opacity: 0.5;
+  }
+
+  /* SECTION LABELS */
+  .section-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    opacity: 0.7;
+    margin-bottom: 32px;
+    font-weight: 400;
+  }
+
+  /* QURAN SECTION */
+  .ayat-block {
+    margin-bottom: 40px;
+    padding: 28px 24px;
+    background: var(--surface);
+    border-left: 2px solid var(--accent-mid);
+    position: relative;
+  }
+
+  .arabic-text {
+    font-family: 'Noto Nastaliq Urdu', serif;
+    font-size: 1.4rem;
+    line-height: 2.2;
+    color: var(--text-primary);
+    direction: rtl;
+    text-align: right;
+    margin-bottom: 16px;
+  }
+
+  .urdu-translation {
+    font-family: 'Noto Nastaliq Urdu', serif;
+    font-size: 0.95rem;
+    line-height: 2;
+    color: var(--text-urdu);
+    direction: rtl;
+    text-align: right;
+    margin-bottom: 10px;
+    font-style: italic;
+  }
+
+  .ayah-ref {
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    color: var(--text-dim);
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  /* QUOTES SECTION */
+  .quote-block {
+    margin-bottom: 28px;
+    padding: 0 0 28px 20px;
+    border-left: 1px solid var(--border);
+    position: relative;
+  }
+
+  .quote-block::before {
+    content:'';
+    position:absolute;
+    left:-1px; top:0;
+    width:1px; height: 40px;
+    background: var(--accent);
+    opacity: 0.5;
+  }
+
+  .quote-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    line-height: 1.75;
+    color: var(--text-secondary);
+    font-weight: 300;
+  }
+
+  /* PSYCHOLOGY SECTION */
+  .psych-block {
+    padding: 32px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+
+  .psych-text {
+    font-size: 0.9rem;
+    line-height: 1.9;
+    color: var(--text-secondary);
+    font-weight: 300;
+  }
+
+  .psych-text + .psych-text {
+    margin-top: 20px;
+  }
+
+  /* PRESENCE LINE */
+  .presence-line {
+    margin-top: 52px;
+    padding: 32px 0;
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+
+  .presence-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    font-style: italic;
+    color: var(--accent);
+    opacity: 0.75;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+    line-height: 1.7;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeIn {
+    from { opacity:0; transform: translateY(8px); }
+    to { opacity:1; transform: translateY(0); }
+  }
+
+  /* SCROLLBAR */
+  #panel::-webkit-scrollbar { width: 4px; }
+  #panel::-webkit-scrollbar-track { background: var(--panel-bg); }
+  #panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  @media (max-width: 600px) {
+    .emotions-grid { grid-template-columns: repeat(2, 1fr); }
+    .panel-inner { padding: 60px 20px 100px; }
+    .ayat-block { padding: 20px 16px; }
+    .arabic-text { font-size: 1.2rem; }
+  }
+  
+  /* Quotes & psychological text */
+.quote-text,
+.psych-text,
+.description {
+  color: #e5e7eb;            /* readable light grey */
+  font-weight: 400;
+  line-height: 1.8;
+  letter-spacing: 0.3px;
+}
+
+/* Headings */
+h1, h2, h3 {
+  color: #f9fafb;            /* near-white but soft */
+  font-weight: 500;
+}
+
+/* Buttons text */
+.emotion-btn {
+  color: #f1f5f9;            /* FIX: not faded */
+  /* background: rgba(255, 255, 255, 0.08); */
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
+}
+
+.bottom-anchor {
+  margin-top: 0px;
+  padding: 0px 0 10px;
+  display: flex;
+  justify-content: center;
+}
+.bottom-anchor a{
+    text-decoration: none;
+}
+
+/* SAME emotion button — but quieter */
+.anchor-variant {
+  min-width: 260px;
+  text-align: center;
+  font-weight: bold;
+  letter-spacing: 0.3px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* subtle breathing effect */
+.anchor-variant::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(127,179,173,0.08);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.anchor-variant:hover::after {
+  opacity: 1;
+}
+
+.anchor-variant:hover {
+  transform: translateY(-1px);
+}
+
+.anchor-variant:active {
+  transform: translateY(0);
+}
+</style>
+</head>
+<body>
+
+<div id="home">
+  <div class="home-header">
+    <h1 class="home-title">What you carry<br>has a name.</h1>
+    <p class="home-subtitle">This space isn’t here to fix you.
+      It’s here to sit with you without asking you to change.</p><br>
+    <p class="home-subtitle">So just click WHEN YOU FEEL...</p>
+    <div class="home-line"></div>
+  </div>
+  <div class="emotions-grid" id="emotionsGrid"></div>
+</div>
+
+<div id="panel">
+  <div class="panel-inner" id="panelContent">
+    <button class="back-btn" id="backBtn" onclick="closePanel()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M19 12H5M5 12l7-7M5 12l7 7"/>
+      </svg>
+      back
+    </button>
+    <div id="emotionDisplay"></div>
+  </div>
+</div>
+
+<script>
+const emotions = [
+  {
+    en: "Numbness",
+    ur: "سُن پن",
+    ayat: [
+      {
+        arabic: "وَإِن تَعُدُّوا نِعْمَةَ اللَّهِ لَا تُحْصُوهَا ۗ إِنَّ اللَّهَ لَغَفُورٌ رَّحِيمٌ",
+        urdu: "اور اگر تم اللہ کی نعمتیں گننا چاہو تو انہیں گن نہ سکو گے — اللہ بخشنے والا، رحم کرنے والا ہے۔",
+        ref: "Surah An-Nahl 16:18"
+      },
+      {
+        arabic: "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ",
+        urdu: "یاد رکھو، اللہ کی یاد ہی وہ چیز ہے جس سے دلوں کو سکون ملتا ہے۔",
+        ref: "Surah Ar-Ra'd 13:28"
+      },
+      {
+        arabic: "وَنَحْنُ أَقْرَبُ إِلَيْهِ مِنْ حَبْلِ الْوَرِيدِ",
+        urdu: "اور ہم اس کی شہ رگ سے بھی زیادہ قریب ہیں۔",
+        ref: "Surah Qaf 50:16"
+      }
+    ],
+    quotes: [
+      "Sometimes the mind goes quiet not because things are fine, but because it has been loud for too long.",
+      "Not feeling anything is itself a kind of feeling — one the body invented to survive what the heart couldn't hold.",
+      "The numb ones are often those who felt so deeply, for so long, that the wires finally went still."
+    ],
+    psych: [
+      "Emotional numbness is not the absence of inner life. It is what happens when the nervous system has been under pressure for so long that it stops signaling. It is a form of protection — not weakness, not indifference. The body learned that going quiet costs less.",
+      "There is nothing wrong with someone who cannot feel right now. The feelings have not disappeared. They are just waiting somewhere underneath, in a place that got sealed off for reasons that made sense at the time."
+    ],
+    presence: "The silence you carry has been noticed, even here."
+  },
+  {
+    en: "Emotional Exhaustion",
+    ur: "جذباتی تھکاوٹ",
+    ayat: [
+      {
+        arabic: "وَلَسَوْفَ يُعْطِيكَ رَبُّكَ فَتَرْضَىٰ",
+        urdu: "اور بہت جلد تمہارا رب تمہیں وہ دے گا جس سے تم راضی ہو جاؤ گے۔",
+        ref: "Surah Ad-Duha 93:5"
+      },
+      {
+        arabic: "مَا وَدَّعَكَ رَبُّكَ وَمَا قَلَىٰ",
+        urdu: "تمہارے رب نے نہ تمہیں چھوڑا ہے، نہ ناراض ہوا ہے۔",
+        ref: "Surah Ad-Duha 93:3"
+      },
+      {
+        arabic: "إِنَّ مَعَ الْعُسْرِ يُسْرًا",
+        urdu: "بے شک تنگی کے ساتھ آسانی ہے۔",
+        ref: "Surah Ash-Sharh 94:6"
+      }
+    ],
+    quotes: [
+      "Being tired in this way — the kind no sleep fixes — is the result of carrying things most people don't even know you're holding.",
+      "You've been responsible for too much, for too long, for too many people. The fatigue is honest.",
+      "There is a kind of exhaustion that lives behind the eyes. You know the one. It isn't from not sleeping enough."
+    ],
+    psych: [
+      "Emotional exhaustion is what accumulates when someone keeps giving — attention, care, patience, understanding — without receiving any of it back in the same measure. It is not a character flaw. It is arithmetic. The account ran low.",
+      "The body does not lie about this. When everything feels heavy and even small things feel like too much, that is not weakness. That is the very honest signal of a system that has been overdrawn for a long time."
+    ],
+    presence: "Whatever you've been carrying — it was real, and it was heavy."
+  },
+  {
+    en: "Overthinking",
+    ur: "حد سے زیادہ سوچنا",
+    ayat: [
+      {
+        arabic: "وَلَا تَقُولَنَّ لِشَيْءٍ إِنِّي فَاعِلٌ ذَٰلِكَ غَدًا",
+        urdu: "اور کسی چیز کے بارے میں یہ مت کہو کہ میں یہ کل کروں گا — مگر اللہ چاہے تو۔",
+        ref: "Surah Al-Kahf 18:23"
+      },
+      {
+        arabic: "قُل لَّن يُصِيبَنَا إِلَّا مَا كَتَبَ اللَّهُ لَنَا",
+        urdu: "کہو، ہم پر کچھ نہیں آئے گا سوائے اس کے جو اللہ نے ہمارے لیے لکھ دیا ہے۔",
+        ref: "Surah At-Tawbah 9:51"
+      },
+      {
+        arabic: "وَاعْلَمُوا أَنَّ اللَّهَ يَعْلَمُ مَا فِي أَنفُسِكُمْ فَاحْذَرُوهُ",
+        urdu: "اور جان لو کہ اللہ جانتا ہے جو تمہارے دلوں میں ہے۔",
+        ref: "Surah Al-Baqarah 2:235"
+      }
+    ],
+    quotes: [
+      "The mind does not spin because you are weak. It spins because you are someone who takes things seriously — more seriously than most.",
+      "Overthinking is often just worry wearing the costume of analysis. It feels productive. It rarely is.",
+      "There are loops in the head that start with 'what if' and don't know how to end. You know them by heart. They know you by name."
+    ],
+    psych: [
+      "Persistent rumination is one of the ways a mind tries to prepare itself for pain it has already experienced before. It is not irrational. If your past has taught you that things can go wrong in unexpected ways, the brain starts doing threat scans constantly. That is not a flaw in your wiring. That is your wiring protecting you.",
+      "The thoughts that won't stop are not trying to torture you. They are trying to resolve something that has not yet been resolved — a feeling, a fear, an old wound that never quite closed. They circle because they haven't found a place to land."
+    ],
+    presence: "The noise in your head has been heard in this quiet."
+  },
+  {
+    en: "Anxiety",
+    ur: "بے چینی",
+    ayat: [
+      {
+        arabic: "لَا تَحْزَنْ إِنَّ اللَّهَ مَعَنَا",
+        urdu: "غم نہ کرو، اللہ ہمارے ساتھ ہے۔",
+        ref: "Surah At-Tawbah 9:40"
+      },
+      {
+        arabic: "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ",
+        urdu: "اللہ ہمارے لیے کافی ہے اور وہ بہترین کارساز ہے۔",
+        ref: "Surah Ali 'Imran 3:173"
+      },
+      {
+        arabic: "وَلَا تَهِنُوا وَلَا تَحْزَنُوا وَأَنتُمُ الْأَعْلَوْنَ إِن كُنتُم مُّؤْمِنِينَ",
+        urdu: "اور کمزوری نہ دکھاؤ اور غم نہ کرو، تم ہی غالب رہو گے اگر تم ایمان والے ہو۔",
+        ref: "Surah Ali 'Imran 3:139"
+      }
+    ],
+    quotes: [
+      "Anxiety is not always imagining the worst. Sometimes it is remembering the worst — very clearly, very accurately.",
+      "The body in anxiety is a body trying to survive a future that hasn't arrived yet. It is working very hard. Too hard.",
+      "That tightness you carry in your chest most days — it is not weakness. It is the weight of everything you have not yet allowed yourself to put down."
+    ],
+    psych: [
+      "Anxiety is the nervous system's attempt to protect a person who has been hurt before, or who is currently under a level of pressure that the body knows is too much. It is not imaginary. It lives in the muscles, the breath, the jaw. It is physical and it is real.",
+      "When the sense of dread arrives without a clear reason, it is not madness. Often, it is an old fear that has found a new disguise. The body remembers what the mind tries to forget."
+    ],
+    presence: "Even the breath that held back — it was held, and it is enough."
+  },
+  {
+    en: "Fear",
+    ur: "ڈر",
+    ayat: [
+      {
+        arabic: "وَلَا تَخَافُوا وَلَا تَحْزَنُوا وَأَبْشِرُوا بِالْجَنَّةِ الَّتِي كُنتُمْ تُوعَدُونَ",
+        urdu: "نہ ڈرو اور نہ غم کرو — اور خوش ہو جاؤ اس جنت کی بشارت سے جس کا تم سے وعدہ کیا گیا تھا۔",
+        ref: "Surah Fussilat 41:30"
+      },
+      {
+        arabic: "اللَّهُ وَلِيُّ الَّذِينَ آمَنُوا يُخْرِجُهُم مِّنَ الظُّلُمَاتِ إِلَى النُّورِ",
+        urdu: "اللہ ایمان والوں کا ولی ہے، وہ انہیں اندھیروں سے نکال کر روشنی کی طرف لاتا ہے۔",
+        ref: "Surah Al-Baqarah 2:257"
+      },
+      {
+        arabic: "إِنَّ اللَّهَ مَعَ الصَّابِرِينَ",
+        urdu: "اللہ صبر کرنے والوں کے ساتھ ہے۔",
+        ref: "Surah Al-Baqarah 2:153"
+      }
+    ],
+    quotes: [
+      "Most fear is not about what could happen. It is about what has already happened once — and the dread of it finding you again.",
+      "Fear that you cannot name is often the most exhausting kind. It has no edges, so you can't work around it.",
+      "Being afraid does not mean you are fragile. Some fears are simply the proof of how much something once mattered."
+    ],
+    psych: [
+      "Fear that persists without obvious cause is usually fear with a memory attached. The nervous system does not always distinguish between something that is happening now and something that happened before. Old pain leaves a residue. Fear is sometimes that residue.",
+      "There is no shame in being afraid of things other people don't seem to notice. Sensitivity is not a defect. It is a different threshold — and it carries its own cost."
+    ],
+    presence: "Whatever you've been bracing yourself against — you don't have to brace alone."
+  },
+  {
+    en: "Sadness",
+    ur: "اداسی",
+    ayat: [
+      {
+        arabic: "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا",
+        urdu: "پس بے شک تنگی کے ساتھ آسانی ہے۔",
+        ref: "Surah Ash-Sharh 94:5"
+      },
+      {
+        arabic: "وَأَيُّوبَ إِذْ نَادَىٰ رَبَّهُ أَنِّي مَسَّنِيَ الضُّرُّ وَأَنتَ أَرْحَمُ الرَّاحِمِينَ",
+        urdu: "اور ایوب کو یاد کرو، جب انہوں نے اپنے رب کو پکارا — مجھے تکلیف پہنچی ہے اور تو رحم کرنے والوں میں سب سے زیادہ رحم کرنے والا ہے۔",
+        ref: "Surah Al-Anbiya 21:83"
+      },
+      {
+        arabic: "وَلَقَدْ عَلِمْنَا الْمُسْتَقْدِمِينَ مِنكُمْ وَلَقَدْ عَلِمْنَا الْمُسْتَأْخِرِينَ",
+        urdu: "اور ہم جانتے ہیں تم میں سے وہ لوگ جو آگے نکل گئے اور وہ بھی جو پیچھے رہ گئے۔",
+        ref: "Surah Al-Hijr 15:24"
+      }
+    ],
+    quotes: [
+      "Sadness that won't explain itself is often the most honest kind. It simply is. It doesn't need a reason to be taken seriously.",
+      "You don't have to earn sadness by having a good enough reason for it. It does not work on merit.",
+      "Sometimes everything looks fine from the outside and you are drowning very quietly and no one can quite tell."
+    ],
+    psych: [
+      "There is a kind of sadness that doesn't announce itself dramatically. It just shows up in the flatness of ordinary days — the way nothing feels like it used to, the way laughter feels like an effort. This is still sadness. It counts.",
+      "Sadness is not a sign that something is broken. It is often a sign that something mattered — a person, a hope, a version of yourself you had to leave behind. Grief takes many forms. Not all of them look like grief."
+    ],
+    presence: "This kind of quiet has been company before."
+  },
+  {
+    en: "Loneliness",
+    ur: "تنہائی",
+    ayat: [
+      {
+        arabic: "وَهُوَ مَعَكُمْ أَيْنَمَا كُنتُمْ",
+        urdu: "اور وہ تمہارے ساتھ ہے جہاں بھی تم ہو۔",
+        ref: "Surah Al-Hadid 57:4"
+      },
+      {
+        arabic: "وَلَقَدْ خَلَقْنَا الْإِنسَانَ وَنَعْلَمُ مَا تُوَسْوِسُ بِهِ نَفْسُهُ",
+        urdu: "اور ہم نے انسان کو پیدا کیا ہے اور ہم جانتے ہیں جو اس کا نفس وسوسہ ڈالتا ہے۔",
+        ref: "Surah Qaf 50:16"
+      },
+      {
+        arabic: "فَاذْكُرُونِي أَذْكُرْكُمْ",
+        urdu: "مجھے یاد کرو، میں تمہیں یاد رکھوں گا۔",
+        ref: "Surah Al-Baqarah 2:152"
+      }
+    ],
+    quotes: [
+      "You can be surrounded by people and be the loneliest person in the room. That is not dramatic. That is a very specific and real kind of pain.",
+      "Loneliness is not always about being alone. Often it is about not being known — not really.",
+      "The specific ache of being with people who don't see you is sharper than the ache of simply being by yourself."
+    ],
+    psych: [
+      "Loneliness is not just the absence of people. It is the absence of being recognized — of someone seeing the actual person inside, not just the surface. You can perform connection for a long time and still feel completely unmet.",
+      "This kind of loneliness often quietly develops over years, not days. It happens when someone learns that sharing things doesn't always lead to understanding — and slowly stops sharing. The silence becomes a habit. The distance becomes a default."
+    ],
+    presence: "Something here has been watching you without needing you to perform."
+  },
+  {
+    en: "Hopelessness",
+    ur: "مایوسی",
+    ayat: [
+      {
+        arabic: "لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ",
+        urdu: "اللہ کی رحمت سے مایوس مت ہو۔",
+        ref: "Surah Az-Zumar 39:53"
+      },
+      {
+        arabic: "إِنَّهُ لَا يَيْأَسُ مِن رَّوْحِ اللَّهِ إِلَّا الْقَوْمُ الْكَافِرُونَ",
+        urdu: "اللہ کی رحمت سے صرف وہی لوگ مایوس ہوتے ہیں جو کافر ہیں۔",
+        ref: "Surah Yusuf 12:87"
+      },
+      {
+        arabic: "وَمَن يَقْنَطُ مِن رَّحْمَةِ رَبِّهِ إِلَّا الضَّالُّونَ",
+        urdu: "اور اپنے رب کی رحمت سے وہی مایوس ہوتا ہے جو بھٹکا ہوا ہو۔",
+        ref: "Surah Al-Hijr 15:56"
+      }
+    ],
+    quotes: [
+      "Hopelessness is not a character flaw. It is what happens when disappointment has been the outcome so many times that hoping starts to feel like setting yourself up.",
+      "The person who has stopped hoping is often someone who hoped very hard, very sincerely, and got hurt for it. That deserves to be understood.",
+      "Not everything that looks like giving up is giving up. Sometimes it is just exhausted faith, resting."
+    ],
+    psych: [
+      "Hopelessness is often the result of a person's expectations consistently not being met — not because they expected too much, but because too much was consistently not given. When the gap between what you needed and what you received becomes wide enough, the mind stops expecting things to close.",
+      "The clinical silence of hopelessness — the quiet conviction that things will not change — is one of the heaviest things a person can carry quietly. It is also one of the least visible. People who have lost hope often look perfectly fine."
+    ],
+    presence: "Even the part of you that has given up — it hasn't been abandoned."
+  },
+  {
+    en: "Feeling Unseen",
+    ur: "نظر انداز ہونا",
+    ayat: [
+      {
+        arabic: "وَاللَّهُ يَعْلَمُ مَا تُسِرُّونَ وَمَا تُعْلِنُونَ",
+        urdu: "اور اللہ جانتا ہے جو تم چھپاتے ہو اور جو ظاہر کرتے ہو۔",
+        ref: "Surah An-Nahl 16:19"
+      },
+      {
+        arabic: "وَهُوَ الَّذِي يَتَوَفَّاكُم بِاللَّيْلِ وَيَعْلَمُ مَا جَرَحْتُم بِالنَّهَارِ",
+        urdu: "اور وہ وہی ہے جو رات کو تمہاری روح قبض کرتا ہے اور وہ جانتا ہے جو تم نے دن میں کیا۔",
+        ref: "Surah Al-An'am 6:60"
+      },
+      {
+        arabic: "إِنَّ اللَّهَ لَا يَخْفَىٰ عَلَيْهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ",
+        urdu: "اللہ سے زمین میں اور آسمان میں کوئی چیز پوشیدہ نہیں۔",
+        ref: "Surah Ali 'Imran 3:5"
+      }
+    ],
+    quotes: [
+      "There is a very particular pain in being the one who listens, who notices, who remembers — and rarely being on the receiving end of that.",
+      "To be overlooked by people who should have seen you is its own category of loss. It doesn't always have a name. But it leaves a mark.",
+      "Some people spend their entire lives being the most present person in every room and somehow still the least acknowledged."
+    ],
+    psych: [
+      "The wound of being unseen is one of the quietest and most persistent wounds. It often begins early — in a family, a classroom, a relationship — where a person's inner world was simply not treated as real or worth meeting. Over time, they stop presenting it.",
+      "The adaptation looks like independence. It looks like being fine on your own. But underneath, there is often a hunger for someone to simply notice — not to fix, not to guide, just to see. That is a human need. Not a weakness."
+    ],
+    presence: "Something here does not need you to explain yourself to acknowledge that you are real."
+  },
+  {
+    en: "Guilt",
+    ur: "احساسِ جرم",
+    ayat: [
+      {
+        arabic: "قُلْ يَا عِبَادِيَ الَّذِينَ أَسْرَفُوا عَلَىٰ أَنفُسِهِمْ لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ",
+        urdu: "کہو: اے میرے بندو جنہوں نے اپنی جانوں پر زیادتی کی — اللہ کی رحمت سے مایوس مت ہو۔",
+        ref: "Surah Az-Zumar 39:53"
+      },
+      {
+        arabic: "وَالَّذِينَ إِذَا فَعَلُوا فَاحِشَةً أَوْ ظَلَمُوا أَنفُسَهُمْ ذَكَرُوا اللَّهَ فَاسْتَغْفَرُوا لِذُنُوبِهِمْ",
+        urdu: "اور وہ لوگ جب کوئی بے حیائی کریں یا اپنے آپ پر ظلم کریں تو اللہ کو یاد کریں اور اپنے گناہوں کی معافی مانگیں۔",
+        ref: "Surah Ali 'Imran 3:135"
+      },
+      {
+        arabic: "إِنَّ اللَّهَ يَغْفِرُ الذُّنُوبَ جَمِيعًا",
+        urdu: "بے شک اللہ تمام گناہوں کو معاف کر دیتا ہے۔",
+        ref: "Surah Az-Zumar 39:53"
+      }
+    ],
+    quotes: [
+      "Guilt that keeps returning is not always evidence that you did something unforgivable. Sometimes it is evidence that you have a conscience that still cares.",
+      "There is a difference between guilt that teaches and guilt that punishes. One moves. The other just stays.",
+      "Carrying the weight of what you did or didn't do is exhausting. No one warns you that regret has no off switch."
+    ],
+    psych: [
+      "Persistent guilt often outlasts its usefulness. At first, guilt signals that something important was crossed — a value, a relationship, a responsibility. After that signal has been received, the guilt has done its job. But for many people, it continues long past that point, becoming a kind of self-punishment that accomplishes nothing new.",
+      "The people who carry guilt the heaviest are often those who care the most. The ones who don't care rarely feel it at all. That matters."
+    ],
+    presence: "Whatever you're still holding from before — it doesn't define the full shape of what you are."
+  },
+  {
+    en: "Self-Blame",
+    ur: "خود کو قصوروار ٹھہرانا",
+    ayat: [
+      {
+        arabic: "لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا",
+        urdu: "اللہ کسی روح پر اس کی طاقت سے زیادہ بوجھ نہیں ڈالتا۔",
+        ref: "Surah Al-Baqarah 2:286"
+      },
+      {
+        arabic: "وَلَا تَزِرُ وَازِرَةٌ وِزْرَ أُخْرَىٰ",
+        urdu: "اور کوئی بوجھ اٹھانے والا دوسرے کا بوجھ نہیں اٹھائے گا۔",
+        ref: "Surah Al-An'am 6:164"
+      },
+      {
+        arabic: "وَأَنْ لَيْسَ لِلْإِنسَانِ إِلَّا مَا سَعَىٰ",
+        urdu: "اور یہ کہ انسان کے لیے صرف وہی ہے جس کی اس نے کوشش کی۔",
+        ref: "Surah An-Najm 53:39"
+      }
+    ],
+    quotes: [
+      "Not everything that went wrong was your fault. Even if you keep trying to arrange the evidence so it looks that way.",
+      "Self-blame is often easier than sitting with the uncertainty of something that had no good answer from the start.",
+      "You were doing the best you could with what you understood then. That is not an excuse. It is a fact."
+    ],
+    psych: [
+      "Self-blame often arises from a subtle belief that if you can identify what you did wrong, you can prevent the pain from happening again. It is a form of control — painful, but familiar. Blaming yourself can feel safer than accepting that some things happened outside your control.",
+      "There is also a version of self-blame that is old — that was learned in environments where you were held responsible for things that were never yours to carry. Old lessons like that don't announce themselves. They just feel like reality."
+    ],
+    presence: "You have been harder on yourself than anything outside you ever was."
+  },
+  {
+    en: "Emotional Shutdown",
+    ur: "جذباتی بند ہو جانا",
+    ayat: [
+      {
+        arabic: "أَفَلَا يَتَدَبَّرُونَ الْقُرْآنَ أَمْ عَلَىٰ قُلُوبٍ أَقْفَالُهَا",
+        urdu: "کیا وہ قرآن پر غور نہیں کرتے، یا ان کے دلوں پر تالے لگے ہوئے ہیں؟",
+        ref: "Surah Muhammad 47:24"
+      },
+      {
+        arabic: "فَبِمَا رَحْمَةٍ مِّنَ اللَّهِ لِنتَ لَهُمْ",
+        urdu: "پس اللہ کی رحمت سے تم ان کے ساتھ نرم رہے۔",
+        ref: "Surah Ali 'Imran 3:159"
+      },
+      {
+        arabic: "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا",
+        urdu: "اے ہمارے رب، ہمارے دلوں کو ٹیڑھا مت کر بعد اس کے کہ تو نے ہمیں ہدایت دی۔",
+        ref: "Surah Ali 'Imran 3:8"
+      }
+    ],
+    quotes: [
+      "Shutting down is not the same as not caring. Sometimes it's the only thing that kept you intact when everything else was breaking.",
+      "When a person goes emotionally flat, it is often the last line of defense — the mind protecting a self that has already taken too many hits.",
+      "You can go through an entire day responding to people, functioning, managing — and feel absolutely nothing behind any of it. That is a particular kind of survival."
+    ],
+    psych: [
+      "Emotional shutdown is a protective mechanism, not a personality trait. When the emotional system has been overwhelmed repeatedly — through loss, conflict, disappointment, or simply the accumulation of too much — it begins to limit what it lets in. The numbness is not apathy. It is armor.",
+      "People in shutdown often appear calm, even competent. They continue to function. But internally, there is a disconnection between what they are doing and what they feel — as though they are watching themselves from a distance. That experience is real, and it has a name, and it is not permanent."
+    ],
+    presence: "Even when nothing is coming through — something is still here with you."
+  },
+  {
+    en: "Inner Heaviness",
+    ur: "اندرونی بوجھ",
+    ayat: [
+      {
+        arabic: "وَوَضَعْنَا عَنكَ وِزْرَكَ",
+        urdu: "اور ہم نے تم سے تمہارا بوجھ اتار دیا۔",
+        ref: "Surah Ash-Sharh 94:2"
+      },
+      {
+        arabic: "الَّذِي أَنقَضَ ظَهْرَكَ",
+        urdu: "جس نے تمہاری پیٹھ توڑ دی تھی۔",
+        ref: "Surah Ash-Sharh 94:3"
+      },
+      {
+        arabic: "وَرَفَعْنَا لَكَ ذِكْرَكَ",
+        urdu: "اور ہم نے تمہارا ذکر بلند کیا۔",
+        ref: "Surah Ash-Sharh 94:4"
+      }
+    ],
+    quotes: [
+      "Some weight doesn't come from one source. It's the accumulation — years of it — pressing down so slowly you stopped noticing it was there.",
+      "The heaviness that lives in the chest and doesn't explain itself is still real. You don't need to understand it to feel it.",
+      "There are people who wake up already tired. Not from sleep, but from what they brought into the night with them."
+    ],
+    psych: [
+      "The experience of persistent inner heaviness — the sense that even ordinary moments feel like wading through something thick — is often the body's way of registering an accumulation of unprocessed weight. Stress, loss, unmet needs, grief. They don't disappear. They settle.",
+      "This heaviness often feels disproportionate to anything specific that's happening now. That's because it usually isn't about now. It is the sum of what has been carried forward — without space to set it down."
+    ],
+    presence: "The weight you carry has been witnessed, even without words."
+  },
+  {
+    en: "Grief",
+    ur: "غم",
+    ayat: [
+      {
+        arabic: "إِنَّا لِلَّهِ وَإِنَّا إِلَيْهِ رَاجِعُونَ",
+        urdu: "بے شک ہم اللہ کے ہیں اور بے شک ہم اسی کی طرف لوٹ کر جائیں گے۔",
+        ref: "Surah Al-Baqarah 2:156"
+      },
+      {
+        arabic: "أُولَٰئِكَ عَلَيْهِمْ صَلَوَاتٌ مِّن رَّبِّهِمْ وَرَحْمَةٌ",
+        urdu: "یہی وہ لوگ ہیں جن پر ان کے رب کی رحمتیں اور مہربانیاں ہیں۔",
+        ref: "Surah Al-Baqarah 2:157"
+      },
+      {
+        arabic: "وَقَالَ إِنَّمَا أَشْكُو بَثِّي وَحُزْنِي إِلَى اللَّهِ",
+        urdu: "اور اس نے کہا: میں تو اپنا درد اور غم صرف اللہ سے بیان کرتا ہوں۔",
+        ref: "Surah Yusuf 12:86"
+      }
+    ],
+    quotes: [
+      "Grief is not linear, and it does not follow a schedule, and it does not care that you've been managing fine for months.",
+      "You can grieve something you never fully had, a version of someone, a future that was assumed, a self that you used to be.",
+      "Some losses don't have funerals. The world doesn't stop for them. But they are losses nonetheless."
+    ],
+    psych: [
+      "Grief is one of the most misunderstood human experiences because it is not limited to death. It is the response to any significant loss — of safety, of connection, of possibility, of self. And it does not follow the stages cleanly. It circles, doubles back, goes quiet, returns suddenly.",
+      "The people who grieve privately — who don't speak it aloud, who continue to function — are not coping better. They are often grieving deeper, alone. The absence of visible grief does not mean the grief isn't there."
+    ],
+    presence: "Whatever left — it mattered. That has not been forgotten here."
+  },
+  {
+    en: "Restlessness",
+    ur: "اضطراب",
+    ayat: [
+      {
+        arabic: "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ",
+        urdu: "آگاہ ہو جاؤ، اللہ کی یاد سے ہی دلوں کو سکون ملتا ہے۔",
+        ref: "Surah Ar-Ra'd 13:28"
+      },
+      {
+        arabic: "وَمَن يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ",
+        urdu: "اور جو اللہ پر توکل کرے تو وہ اس کے لیے کافی ہے۔",
+        ref: "Surah At-Talaq 65:3"
+      },
+      {
+        arabic: "يَا أَيُّهَا الَّذِينَ آمَنُوا اسْتَعِينُوا بِالصَّبْرِ وَالصَّلَاةِ",
+        urdu: "اے ایمان والو، صبر اور نماز سے مدد لو۔",
+        ref: "Surah Al-Baqarah 2:153"
+      }
+    ],
+    quotes: [
+      "The feeling of needing to be somewhere else, doing something else, being someone else — without knowing where or what or who — is one of the lonelier feelings there is.",
+      "Restlessness is often just unprocessed feeling that doesn't know where to go. It becomes motion because stillness is harder.",
+      "Sometimes the urge to constantly be moving is the only way to stay ahead of what's chasing you from the inside."
+    ],
+    psych: [
+      "Restlessness is often anxiety that has not found an object. The nervous system is activated but there is nothing clear to respond to, so it generates a generalised agitation — a need to move, to change, to escape — without a clear destination.",
+      "It can also be the symptom of a life in which stillness has become associated with pain. When quietness meant confronting things that were too much, the body learned to keep moving. The restlessness is the body keeping its old promise."
+    ],
+    presence: "The stillness here doesn't demand anything from you."
+  },
+  {
+    en: "Quiet Anger",
+    ur: "خاموش غصہ",
+    ayat: [
+      {
+        arabic: "وَالْكَاظِمِينَ الْغَيْظَ وَالْعَافِينَ عَنِ النَّاسِ",
+        urdu: "اور وہ جو غصے کو پی جاتے ہیں اور لوگوں کو معاف کر دیتے ہیں۔",
+        ref: "Surah Ali 'Imran 3:134"
+      },
+      {
+        arabic: "وَلَمَنِ انتَصَرَ بَعْدَ ظُلْمِهِ فَأُولَٰئِكَ مَا عَلَيْهِم مِّن سَبِيلٍ",
+        urdu: "اور جو ظلم کے بعد بدلہ لے لے تو ایسوں پر کوئی الزام نہیں۔",
+        ref: "Surah Ash-Shura 42:41"
+      },
+      {
+        arabic: "وَلَا تَسْتَوِي الْحَسَنَةُ وَلَا السَّيِّئَةُ",
+        urdu: "اور نیکی اور برائی برابر نہیں ہوتیں۔",
+        ref: "Surah Fussilat 41:34"
+      }
+    ],
+    quotes: [
+      "Anger that you never show anyone doesn't go away. It settles. It becomes something quieter and heavier and harder to name.",
+      "There are things that happened that you had every right to be furious about, and you were never allowed to be.",
+      "Quiet anger is often old anger. It was put away somewhere because there was no safe place to put it down."
+    ],
+    psych: [
+      "Anger that is consistently suppressed does not resolve itself. It transforms. It becomes resentment, distance, numbness, or a chronic low-grade tension that colors everything. The anger was not wrong — it was a response to something that genuinely warranted a response.",
+      "People who carry quiet anger often learned early that expressing anger was dangerous, ineffective, or too costly. So they learned to hold it inside and appear fine. The appearance is convincing. The internal experience is not."
+    ],
+    presence: "Whatever you swallowed instead of saying — it is still valid."
+  },
+  {
+    en: "Confusion",
+    ur: "الجھن",
+    ayat: [
+      {
+        arabic: "وَإِن تُطِيعُوهُ تَهْتَدُوا",
+        urdu: "اور اگر تم اس کی اطاعت کرو تو ہدایت پاؤ گے۔",
+        ref: "Surah An-Nur 24:54"
+      },
+      {
+        arabic: "رَبَّنَا لَا تُؤَاخِذْنَا إِن نَّسِينَا أَوْ أَخْطَأْنَا",
+        urdu: "اے ہمارے رب، ہمیں نہ پکڑ اگر ہم بھول جائیں یا غلطی کریں۔",
+        ref: "Surah Al-Baqarah 2:286"
+      },
+      {
+        arabic: "سَيَجْعَلُ اللَّهُ بَعْدَ عُسْرٍ يُسْرًا",
+        urdu: "اللہ عنقریب تنگی کے بعد آسانی پیدا کر دے گا۔",
+        ref: "Surah At-Talaq 65:7"
+      }
+    ],
+    quotes: [
+      "Not knowing which way to go is not the same as being lost. Sometimes the path is genuinely unclear. That is a real condition, not a failure.",
+      "Confusion is what happens when you're at the edge of what you've known how to navigate. It is disorienting. It is also sometimes the first step of somewhere new.",
+      "The need to have clarity about everything — who you are, where you're going, what you feel — is a burden that no one can actually meet."
+    ],
+    psych: [
+      "Confusion, especially about one's own feelings or direction, often occurs during or after periods of significant change or loss. The internal map that once worked no longer fits the territory. That is disorienting in a way that is hard to explain to people who haven't experienced it.",
+      "There is also a confusion that comes from being given too many contradictory messages about who you should be, what you should want, what you should feel. That kind of confusion is not intellectual — it is existential, and it sits very quietly at the center of many things."
+    ],
+    presence: "You don't have to know where this is going for this moment to mean something."
+  },
+  {
+    en: "Emptiness",
+    ur: "خالی پن",
+    ayat: [
+      {
+        arabic: "وَنَفَخْتُ فِيهِ مِن رُّوحِي",
+        urdu: "اور میں نے اس میں اپنی روح پھونکی۔",
+        ref: "Surah Al-Hijr 15:29"
+      },
+      {
+        arabic: "أَلَمْ نَشْرَحْ لَكَ صَدْرَكَ",
+        urdu: "کیا ہم نے تمہارے لیے تمہارا سینہ کھول نہیں دیا؟",
+        ref: "Surah Ash-Sharh 94:1"
+      },
+      {
+        arabic: "فَإِذَا فَرَغْتَ فَانصَبْ",
+        urdu: "پھر جب تم فارغ ہو تو محنت کرو۔",
+        ref: "Surah Ash-Sharh 94:7"
+      }
+    ],
+    quotes: [
+      "Emptiness is not nothing. It is the absence of something that was once there — or something that was supposed to be there and never arrived.",
+      "Feeling hollow is one of the most honest feelings. It says: something is missing. It does not always know what.",
+      "You can go through the motions of an entire life — laughing, working, talking — and feel that none of it is landing anywhere inside you."
+    ],
+    psych: [
+      "Emptiness is a complex emotional state that often accompanies prolonged sadness, disconnection, or unmet need. It is not the same as depression, though it can accompany it. It is the felt sense of a space inside that is not being filled — by meaning, by connection, by purpose.",
+      "People who feel empty often have a history of having their emotional needs repeatedly unmet. Over time, the desire itself becomes suppressed — not because the need went away, but because wanting things that never came felt more painful than feeling nothing."
+    ],
+    presence: "Empty spaces don't need to be filled to be witnessed."
+  },
+  {
+    en: "Loss of Direction",
+    ur: "راستہ کھو جانا",
+    ayat: [
+      {
+        arabic: "وَمَن يَعْتَصِم بِاللَّهِ فَقَدْ هُدِيَ إِلَىٰ صِرَاطٍ مُّسْتَقِيمٍ",
+        urdu: "اور جو اللہ کو مضبوطی سے تھام لے تو وہ سیدھی راہ پر آ گیا۔",
+        ref: "Surah Ali 'Imran 3:101"
+      },
+      {
+        arabic: "وَعَسَىٰ أَن تَكْرَهُوا شَيْئًا وَهُوَ خَيْرٌ لَّكُمْ",
+        urdu: "اور ہو سکتا ہے کہ تم کسی چیز کو ناپسند کرو اور وہ تمہارے لیے بہتر ہو۔",
+        ref: "Surah Al-Baqarah 2:216"
+      },
+      {
+        arabic: "إِنَّ رَبَّكَ يَعْلَمُ أَنَّكَ تَقُومُ أَدْنَىٰ مِن ثُلُثَيِ اللَّيْلِ",
+        urdu: "بے شک تمہارا رب جانتا ہے کہ تم رات کے دو تہائی سے کم میں کھڑے رہتے ہو۔",
+        ref: "Surah Al-Muzzammil 73:20"
+      }
+    ],
+    quotes: [
+      "Not knowing what you want anymore — not out of laziness, but out of genuine blankness — is disorienting in a way that is very hard to explain to people who are still driven.",
+      "You don't lose direction because you stopped caring. Sometimes direction is lost when everything you cared about changed shape or went away.",
+      "Some people arrive at a point in their life where the map they were following simply stops. No new map appears. They stand there. That takes something."
+    ],
+    psych: [
+      "Loss of direction often follows a period of significant transition or loss. When the roles, relationships, or goals that once organized a person's sense of self disappear or change, the question 'what now' can feel unanswerable — not because the person lacks capability, but because the internal structure that made things make sense is no longer in place.",
+      "This state is often underestimated because it is invisible. The person continues to function. But internally, there is a groundlessness — a lack of anchor — that is genuinely distressing, even if it looks like nothing from the outside."
+    ],
+    presence: "Being between places is still being somewhere."
+  },
+  {
+    en: "Longing for Peace",
+    ur: "سکون کی تلاش",
+    ayat: [
+      {
+        arabic: "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ",
+        urdu: "یاد رکھو — اللہ کے ذکر سے ہی دلوں کو اطمینان ملتا ہے۔",
+        ref: "Surah Ar-Ra'd 13:28"
+      },
+      {
+        arabic: "السَّلَامُ عَلَيْكُمْ طِبْتُمْ فَادْخُلُوهَا خَالِدِينَ",
+        urdu: "تم پر سلامتی ہو، تم اچھے رہے، پس اس میں ہمیشہ کے لیے داخل ہو جاؤ۔",
+        ref: "Surah Az-Zumar 39:73"
+      },
+      {
+        arabic: "يَا أَيَّتُهَا النَّفْسُ الْمُطْمَئِنَّةُ ارْجِعِي إِلَىٰ رَبِّكِ رَاضِيَةً مَّرْضِيَّةً",
+        urdu: "اے مطمئن روح، اپنے رب کی طرف لوٹ آ — خوشنود اور پسندیدہ۔",
+        ref: "Surah Al-Fajr 89:27-28"
+      }
+    ],
+    quotes: [
+      "Peace is not always the absence of noise. Sometimes it is just the absence of the need to keep explaining yourself.",
+      "Wanting peace is not weakness. It is the most honest want a person who has been through too much can have.",
+      "Not asking for happiness. Not asking for answers. Just for one day that doesn't feel like a war with yourself."
+    ],
+    psych: [
+      "The longing for peace is often the body's clearest and most urgent communication. It arises after sustained periods of conflict — internal or external — where rest never came, where safety was conditional, where the person had to remain vigilant just to stay intact.",
+      "This longing is not passive. It is not giving up. It is the natural conclusion of a system that has been working too hard for too long finally acknowledging what it needs. Peace is not a luxury. For some people, it is something they have never actually had — and the longing for it is one of the most honest things about them."
+    ],
+    presence: "This is a quiet room. You are allowed to just exist in it."
+  },
+  {
+    en: "Feeling Misunderstood",
+    ur: "غلط سمجھا جانا",
+    ayat: [
+      {
+        arabic: "وَاللَّهُ يَعْلَمُ مَا فِي قُلُوبِكُمْ",
+        urdu: "اور اللہ جانتا ہے جو تمہارے دلوں میں ہے۔",
+        ref: "Surah Al-Ahzab 33:51"
+      },
+      {
+        arabic: "وَهُوَ أَعْلَمُ بِكُمْ إِذْ أَنشَأَكُم مِّنَ الْأَرْضِ",
+        urdu: "اور وہ تمہیں خوب جانتا ہے جب اس نے تمہیں زمین سے پیدا کیا۔",
+        ref: "Surah An-Najm 53:32"
+      },
+      {
+        arabic: "إِنَّهُ عَلِيمٌ بِذَاتِ الصُّدُورِ",
+        urdu: "بے شک وہ سینوں کی باتوں سے خوب واقف ہے۔",
+        ref: "Surah Al-Hadid 57:6"
+      }
+    ],
+    quotes: [
+      "Being misunderstood by people you hoped would understand — that is its own category of loneliness. It is lonely in a very specific way.",
+      "You can spend years trying to translate yourself accurately into words and still feel like nothing landed the way it was meant.",
+      "The exhausting thing is not being misunderstood once. It is continuing to try after you've been misunderstood enough times to know what's coming."
+    ],
+    psych: [
+      "Feeling chronically misunderstood is one of the most isolating experiences because it often leads a person to stop trying to be understood. Communication becomes performative — they say what's expected, not what's true. The real self goes quiet.",
+      "This often begins in environments where a child's inner experience was consistently mislabeled, dismissed, or reframed by adults. Over time, the person begins to doubt their own reading of themselves. Self-knowledge becomes uncertain. Being seen accurately by someone — even briefly — can be startling."
+    ],
+    presence: "Something here does not need you to rephrase what you are."
+  },
+  {
+    en: "Disappointment",
+    ur: "مایوسی کا درد",
+    ayat: [
+      {
+        arabic: "وَعَسَىٰ أَن تَكْرَهُوا شَيْئًا وَهُوَ خَيْرٌ لَّكُمْ ۖ وَعَسَىٰ أَن تُحِبُّوا شَيْئًا وَهُوَ شَرٌّ لَّكُمْ",
+        urdu: "اور ہو سکتا ہے کہ تم کسی چیز کو برا سمجھو اور وہ تمہارے لیے بہتر ہو — اور ہو سکتا ہے تم کسی چیز کو چاہو اور وہ تمہارے لیے بری ہو۔",
+        ref: "Surah Al-Baqarah 2:216"
+      },
+      {
+        arabic: "وَمَا أَصَابَكَ مِن سَيِّئَةٍ فَمِن نَّفْسِكَ",
+        urdu: "اور جو تکلیف تمہیں پہنچے وہ تمہاری طرف سے ہے۔",
+        ref: "Surah An-Nisa 4:79"
+      },
+      {
+        arabic: "لِكَيْلَا تَأْسَوْا عَلَىٰ مَا فَاتَكُمْ وَلَا تَفْرَحُوا بِمَا آتَاكُمْ",
+        urdu: "تاکہ تم اس پر افسوس نہ کرو جو تم سے چھوٹ گئی اور نہ اس پر اِتراؤ جو تمہیں ملی۔",
+        ref: "Surah Al-Hadid 57:23"
+      }
+    ],
+    quotes: [
+      "Disappointment is grief wearing a practical coat. It hurts in an ordinary, undramatic way — which makes it easy to overlook and hard to place.",
+      "You expected something because you had reason to. That is not naivety. That is trust. And when it didn't happen, the loss was real.",
+      "Repeated disappointment eventually changes a person. Not suddenly. Slowly. They just stop expecting in the same way."
+    ],
+    psych: [
+      "Disappointment is the emotional response to the gap between expectation and reality — but more than that, it is the response to a hope that was real and didn't survive contact with the world. It is a minor grief, but it accumulates.",
+      "When disappointment happens often enough — in relationships, in systems, in people — it changes how a person holds hope. They may continue to function and even to care, but with a guard kept up. The guard is not cynicism. It is intelligence acquired through experience."
+    ],
+    presence: "The thing you hoped for was worth hoping for. That still counts."
+  },
+  {
+    en: "Detachment",
+    ur: "لاتعلقی",
+    ayat: [
+      {
+        arabic: "إِنَّا نَحْنُ نَزَّلْنَا الذِّكْرَ وَإِنَّا لَهُ لَحَافِظُونَ",
+        urdu: "بے شک ہم نے ہی اس ذکر کو نازل کیا ہے اور ہم ہی اس کی حفاظت کرنے والے ہیں۔",
+        ref: "Surah Al-Hijr 15:9"
+      },
+      {
+        arabic: "أَلَا يَعْلَمُ مَنْ خَلَقَ وَهُوَ اللَّطِيفُ الْخَبِيرُ",
+        urdu: "کیا وہ نہیں جانتا جس نے پیدا کیا — وہ باریک بین اور باخبر ہے۔",
+        ref: "Surah Al-Mulk 67:14"
+      },
+      {
+        arabic: "وَهُوَ مَعَكُمْ أَيْنَمَا كُنتُمْ ۚ وَاللَّهُ بِمَا تَعْمَلُونَ بَصِيرٌ",
+        urdu: "اور وہ تمہارے ساتھ ہے جہاں بھی تم ہو — اور اللہ تمہارے اعمال کو خوب دیکھنے والا ہے۔",
+        ref: "Surah Al-Hadid 57:4"
+      }
+    ],
+    quotes: [
+      "Detachment from the world around you is not always a choice. Sometimes it is what remains after you've been pulled back from too many things, too many times.",
+      "Going through life at a remove — watching it rather than inhabiting it — is how some people protect themselves from a pain they cannot name and cannot yet afford to feel.",
+      "The person who has detached is not gone. They are somewhere inside, watching very carefully."
+    ],
+    psych: [
+      "Detachment — the felt sense of observing one's own life from a distance, of emotional non-participation — is a dissociative response. It develops as a form of self-protection. When the world became too much too often, the mind created distance. The distance helped.",
+      "This is not the same as not caring, and it is not the same as not feeling. Beneath the detachment, there is usually a great deal happening. The detachment is not the end. It is the buffer."
+    ],
+    presence: "Distance is still a way of being present. You are here."
+  }
+];
+
+const grid = document.getElementById('emotionsGrid');
+const panel = document.getElementById('panel');
+const emotionDisplay = document.getElementById('emotionDisplay');
+
+emotions.forEach((e, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'emotion-btn';
+  btn.innerHTML = `<span class="en">${e.en}</span>`;
+  btn.addEventListener('click', () => openEmotion(i));
+  grid.appendChild(btn);
+});
+
+function openEmotion(i) {
+  const e = emotions[i];
+  let html = `
+    <div class="emotion-header">
+      <div class="emotion-title-en">${e.en}</div>
+    </div>
+
+    <div class="section-label">Qur'anic Verses</div>
+    ${e.ayat.map(a => `
+    <div class="ayat-block">
+      <div class="arabic-text">${a.arabic}</div>
+      <div class="urdu-translation">${a.urdu}</div>
+      <div class="ayah-ref">${a.ref}</div>
+    </div>`).join('')}
+
+    <div class="section-divider"></div>
+
+    <div class="section-label">Witness</div>
+    ${e.quotes.map(q => `
+    <div class="quote-block">
+      <div class="quote-text">${q}</div>
+    </div>`).join('')}
+
+    <div class="section-divider"></div>
+
+    <div class="section-label">Understanding</div>
+    <div class="psych-block">
+      ${e.psych.map(p => `<p class="psych-text">${p}</p>`).join('')}
+    </div>
+
+    <div class="presence-line">
+      <div class="presence-text">${e.presence}</div>
+    </div>
+  `;
+  emotionDisplay.innerHTML = html;
+  panel.scrollTop = 0;
+  panel.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePanel() {
+  panel.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+panel.addEventListener('keydown', e => { if(e.key === 'Escape') closePanel(); });
+</script>
+<!-- QUIET BOTTOM ANCHOR -->
+<div class="bottom-anchor">
+  <a href="diary.html" class="emotion-btn anchor-variant">
+    THERE IS SOMETHING MORE =>
+  </a>
+</div>
+</body>
+</html>

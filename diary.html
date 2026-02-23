@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Private</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0f1014;
+    --bg2:       #14161b;
+    --bg3:       #1a1d24;
+    --border:    #252830;
+    --border2:   #2e323d;
+    --accent:    #8fab8e;
+    --accent2:   rgba(139,158,138,0.15);
+    --accent3:   rgba(139,158,138,0.06);
+    --text:      #dee5f2;
+    --text2:     #8a909e;
+    --text3:     #adb2be;
+    --danger:    #9e6b6b;
+    --radius:    4px;
+  }
+
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'EB Garamond', serif;
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 20%, rgba(139,158,138,0.025) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 80%, rgba(100,110,140,0.02) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── SCREENS ─── */
+  .screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px;
+    z-index: 10;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+  }
+  .screen.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* ─── SHARED CARD ─── */
+  .card {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    animation: rise 0.6s ease forwards;
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.7rem;
+    font-weight: 400;
+    color: var(--text);
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+  }
+
+  .card-sub {
+    font-size: 0.88rem;
+    color: var(--text3);
+    letter-spacing: 0.04em;
+    font-style: italic;
+  }
+
+  /* ─── INPUTS ─── */
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .field label {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text3);
+  }
+
+  .field input {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'EB Garamond', serif;
+    font-size: 1rem;
+    padding: 13px 16px;
+    border-radius: var(--radius);
+    outline: none;
+    transition: border-color 0.3s ease, background 0.3s ease;
+    letter-spacing: 0.05em;
+  }
+
+  .field input:focus {
+    border-color: var(--accent);
+    background: var(--bg3);
+  }
+
+  .field input::placeholder { color: var(--text3); }
+
+  /* ─── ERROR LINE ─── */
+  .error-line {
+    font-size: 0.82rem;
+    color: var(--danger);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    font-style: italic;
+    min-height: 1.2em;
+  }
+  .error-line.show { opacity: 1; }
+
+  /* ─── BUTTONS ─── */
+  .btn {
+    background: none;
+    border: 1px solid var(--border2);
+    color: var(--text2);
+    font-family: 'EB Garamond', serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+    padding: 12px 24px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent2);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .btn:hover {
+    border-color: var(--accent);
+    color: var(--text);
+  }
+  .btn:hover::before { opacity: 1; }
+
+  .btn-primary {
+    border-color: var(--accent);
+    color: var(--text);
+    background: var(--accent3);
+  }
+  .btn-primary:hover { background: var(--accent2); }
+
+  /* ─── SETUP SCREEN ─── */
+  #setupNotes {
+    font-size: 0.8rem;
+    color: var(--text3);
+    line-height: 1.7;
+    border-left: 1px solid var(--border2);
+    padding-left: 14px;
+    font-style: italic;
+  }
+
+  /* ─── MAIN SCREEN ─── */
+  #mainScreen {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: 0;
+  }
+
+  #mainScreen.active {
+    display: flex;
+  }
+
+  .main-layout {
+    width: 100%;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 56px 28px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    min-height: 100vh;
+    animation: rise 0.7s ease forwards;
+  }
+
+  .main-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 48px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .main-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--text3);
+    letter-spacing: 0.02em;
+  }
+
+  .date-display {
+    font-size: 0.75rem;
+    color: var(--text3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ─── TEXTAREA ─── */
+  .write-area {
+    flex: 1;
+    position: relative;
+  }
+
+  #entryText {
+    width: 100%;
+    min-height: 52vh;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'EB Garamond', serif;
+    font-size: 1.12rem;
+    line-height: 1.85;
+    resize: none;
+    padding: 0;
+    caret-color: var(--accent);
+    letter-spacing: 0.01em;
+  }
+
+  #entryText::placeholder {
+    color: var(--text3);
+    font-style: italic;
+  }
+
+  /* ─── BOTTOM BAR ─── */
+  .bottom-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .save-feedback {
+    font-size: 0.8rem;
+    color: var(--accent);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    font-style: italic;
+    letter-spacing: 0.04em;
+  }
+
+  .save-feedback.show { opacity: 1; }
+
+  .bottom-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .btn-ghost {
+    background: none;
+    border: none;
+    color: var(--text3);
+    font-family: 'EB Garamond', serif;
+    font-size: 0.82rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    padding: 6px 0;
+    transition: color 0.3s ease;
+    position: relative;
+  }
+
+  .btn-ghost::after {
+    content: '';
+    position: absolute;
+    left: 0; bottom: 0;
+    width: 0; height: 1px;
+    background: var(--accent);
+    transition: width 0.3s ease;
+  }
+
+  .btn-ghost:hover { color: var(--text2); }
+  .btn-ghost:hover::after { width: 100%; }
+
+  /* ─── ENTRIES PANEL ─── */
+  #entriesPanel {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 50;
+    overflow-y: auto;
+    transform: translateY(100%);
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #entriesPanel.open {
+    transform: translateY(0);
+  }
+
+  .entries-layout {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 56px 28px 100px;
+    opacity: 0;
+    transition: opacity 0.4s ease 0.3s;
+  }
+
+  #entriesPanel.open .entries-layout { opacity: 1; }
+
+  .entries-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 52px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .entries-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--text);
+  }
+
+  .entries-count {
+    font-size: 0.75rem;
+    color: var(--text3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ─── ACCORDION ENTRIES ─── */
+  .entry-item {
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .entry-item:first-child { border-top: 1px solid var(--border); }
+
+  .entry-toggle {
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--text2);
+    cursor: pointer;
+    padding: 20px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    text-align: left;
+    transition: color 0.3s ease;
+    font-family: 'EB Garamond', serif;
+  }
+
+  .entry-toggle:hover { color: var(--text); }
+
+  .entry-date {
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: inherit;
+    flex-shrink: 0;
+  }
+
+  .entry-preview {
+    font-size: 0.92rem;
+    font-style: italic;
+    color: var(--text3);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+  }
+
+  .entry-chevron {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    color: var(--text3);
+    transition: transform 0.3s ease;
+  }
+
+  .entry-item.expanded .entry-chevron {
+    transform: rotate(180deg);
+  }
+
+  .entry-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+  }
+
+  .entry-item.expanded .entry-body {
+    max-height: 2000px;
+  }
+
+  .entry-content {
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: var(--text2);
+    padding: 0 0 28px 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    letter-spacing: 0.01em;
+  }
+
+  .entry-delete {
+    margin-top: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'EB Garamond', serif;
+    font-size: 0.78rem;
+    color: var(--text3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0;
+    transition: color 0.3s ease;
+    display: inline-block;
+  }
+
+  .entry-delete:hover { color: var(--danger); }
+
+  .no-entries {
+    text-align: center;
+    padding: 60px 0;
+    color: var(--text3);
+    font-style: italic;
+    font-size: 1rem;
+  }
+
+  /* ─── AUTH OVERLAY FOR ENTRIES ─── */
+  #authOverlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+
+  #authOverlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* ─── SCROLLBAR ─── */
+  #entriesPanel::-webkit-scrollbar { width: 3px; }
+  #entriesPanel::-webkit-scrollbar-track { background: var(--bg); }
+  #entriesPanel::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  /* ─── WORDCOUNT ─── */
+  .wordcount {
+    font-size: 0.75rem;
+    color: var(--text3);
+    letter-spacing: 0.06em;
+    transition: color 0.3s ease;
+  }
+
+  /* ─── LOCK ICON ─── */
+  .lock-mark {
+    display: block;
+    width: 20px;
+    height: 20px;
+    margin: 0 auto 20px;
+    color: var(--text3);
+    opacity: 0.5;
+  }
+
+  @media (max-width: 520px) {
+    .main-layout, .entries-layout { padding: 40px 20px 80px; }
+    .card { max-width: 100%; }
+    .entry-preview { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ SETUP SCREEN ═══════════════ -->
+<div class="screen active" id="setupScreen">
+  <div class="card">
+    <div class="card-heading">
+      <h1 class="card-title">Before you begin</h1>
+      <p class="card-sub">Set a password. This is yours alone.</p>
+    </div>
+    <div class="field">
+      <label>Choose a password</label>
+      <input type="password" id="setupPass" placeholder="something only you know" autocomplete="new-password">
+    </div>
+    <div class="field">
+      <label>Confirm it</label>
+      <input type="password" id="setupPassConfirm" placeholder="once more" autocomplete="new-password">
+    </div>
+    <div class="error-line" id="setupError"></div>
+    <button class="btn btn-primary" id="setupBtn">Create my diary</button>
+    <p id="setupNotes">Your password is hashed and stored only on this device. Nothing leaves here. No one else can read what you write.</p>
+  </div>
+</div>
+
+<!-- ═══════════════ LOGIN SCREEN ═══════════════ -->
+<div class="screen" id="loginScreen">
+  <div class="card">
+    <div class="card-heading">
+      <svg class="lock-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+        <rect x="3" y="11" width="18" height="11" rx="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      <h1 class="card-title">Welcome back</h1>
+      <p class="card-sub">Enter your password to continue.</p>
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="loginPass" placeholder="your password" autocomplete="current-password">
+    </div>
+    <div class="error-line" id="loginError"></div>
+    <button class="btn btn-primary" id="loginBtn">Open my diary</button>
+  </div>
+</div>
+
+<!-- ═══════════════ MAIN WRITING SCREEN ═══════════════ -->
+<div class="screen" id="mainScreen">
+  <div class="main-layout">
+    <div class="main-header">
+      <span class="main-title">Privately Crafted</span>
+      <span class="date-display" id="dateDisplay"></span>
+    </div>
+
+    <div class="write-area">
+      <textarea
+        id="entryText"
+        placeholder="Write anything you wouldn't say out loud… anything you wouldn't share with anyone, share it with your self and with your creator (ALLAH).... this place only belongs to you no one else knows about it and wouldn't fint out unless you choose to share it... so let it all out, the good and the bad, the happy and the sad, the beautiful and the ugly... just write, and let it be a release for your soul....."
+        spellcheck="true"
+        autocomplete="off"
+      ></textarea>
+    </div>
+
+    <div class="bottom-bar">
+      <span class="save-feedback" id="saveFeedback">saved quietly.</span>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span class="wordcount" id="wordcount">0 words</span>
+      </div>
+      <div class="bottom-actions">
+        <button class="btn-ghost" id="openEntriesBtn">Open what you've written</button>
+        <button class="btn btn-primary" id="saveBtn" style="padding:10px 20px;font-size:0.88rem;">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ AUTH OVERLAY (for entries) ═══════════════ -->
+<div id="authOverlay">
+  <div class="card">
+    <div class="card-heading">
+      <h1 class="card-title">Confirm it's you</h1>
+      <p class="card-sub">Enter your password to read your entries.</p>
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="authPass" placeholder="your password" autocomplete="current-password">
+    </div>
+    <div class="error-line" id="authError"></div>
+    <div style="display:flex;gap:12px;">
+      <button class="btn" id="authCancelBtn" style="flex:1;">Cancel</button>
+      <button class="btn btn-primary" id="authConfirmBtn" style="flex:1;">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ ENTRIES PANEL ═══════════════ -->
+<div id="entriesPanel">
+  <div class="entries-layout">
+    <div class="entries-header">
+      <div>
+        <h2 class="entries-title">What you've written</h2>
+      </div>
+      <div style="display:flex;gap:16px;align-items:center;">
+        <span class="entries-count" id="entriesCount"></span>
+        <button class="btn-ghost" id="closeEntriesBtn">Close</button>
+      </div>
+    </div>
+    <div id="entriesList"></div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ─── CRYPTO HELPERS ───
+  async function hashPassword(pw) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+
+  async function verifyPassword(pw) {
+    const h = await hashPassword(pw);
+    return h === localStorage.getItem('_diary_hash');
+  }
+
+  // ─── STORAGE HELPERS ───
+  const ENTRIES_KEY = '_diary_entries';
+  const HASH_KEY    = '_diary_hash';
+
+  function loadEntries() {
+    try { return JSON.parse(localStorage.getItem(ENTRIES_KEY)) || []; }
+    catch { return []; }
+  }
+
+  function saveEntries(entries) {
+    localStorage.setItem(ENTRIES_KEY, JSON.stringify(entries));
+  }
+
+  // ─── UI HELPERS ───
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const s = document.getElementById(id);
+    if (s) s.classList.add('active');
+  }
+
+  function showError(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.classList.add('show');
+  }
+
+  function clearError(id) {
+    const el = document.getElementById(id);
+    el.textContent = '';
+    el.classList.remove('show');
+  }
+
+  function formatDate(ts) {
+    return new Date(ts).toLocaleDateString('en-GB', {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+    });
+  }
+
+  function formatDateShort(ts) {
+    return new Date(ts).toLocaleDateString('en-GB', {
+      day: '2-digit', month: 'short', year: 'numeric',
+    }) + ' · ' + new Date(ts).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+  }
+
+  // ─── DATE DISPLAY ───
+  function updateDateDisplay() {
+    const el = document.getElementById('dateDisplay');
+    if (!el) return;
+    el.textContent = new Date().toLocaleDateString('en-GB', {
+      weekday: 'short', day: 'numeric', month: 'long'
+    });
+  }
+
+  // ─── WORDCOUNT ───
+  document.getElementById('entryText').addEventListener('input', function() {
+    const words = this.value.trim() ? this.value.trim().split(/\s+/).length : 0;
+    const el = document.getElementById('wordcount');
+    el.textContent = words === 1 ? '1 word' : words + ' words';
+  });
+
+  // ─── SETUP ───
+  const setupBtn = document.getElementById('setupBtn');
+
+  setupBtn.addEventListener('click', async () => {
+    const pw  = document.getElementById('setupPass').value;
+    const pw2 = document.getElementById('setupPassConfirm').value;
+    clearError('setupError');
+
+    if (pw.length < 4) return showError('setupError', 'Choose something a little longer.');
+    if (pw !== pw2) return showError('setupError', 'They dont match.');
+
+    const hash = await hashPassword(pw);
+    localStorage.setItem(HASH_KEY, hash);
+    showScreen('mainScreen');
+    updateDateDisplay();
+  });
+
+  document.getElementById('setupPass').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('setupPassConfirm').focus(); });
+  document.getElementById('setupPassConfirm').addEventListener('keydown', e => { if(e.key==='Enter') setupBtn.click(); });
+
+  // ─── LOGIN ───
+  const loginBtn = document.getElementById('loginBtn');
+
+  loginBtn.addEventListener('click', async () => {
+    const pw = document.getElementById('loginPass').value;
+    clearError('loginError');
+    const ok = await verifyPassword(pw);
+    if (!ok) {
+      document.getElementById('loginPass').value = '';
+      return showError('loginError', 'That doesnt seem right.');
+    }
+    showScreen('mainScreen');
+    updateDateDisplay();
+  });
+
+  document.getElementById('loginPass').addEventListener('keydown', e => { if(e.key==='Enter') loginBtn.click(); });
+
+  // ─── SAVE ENTRY ───
+  const saveBtn = document.getElementById('saveBtn');
+  const feedbackEl = document.getElementById('saveFeedback');
+  let feedbackTimer;
+
+  saveBtn.addEventListener('click', () => {
+    const text = document.getElementById('entryText').value.trim();
+    if (!text) return;
+
+    const entries = loadEntries();
+    entries.unshift({ id: Date.now(), ts: Date.now(), body: text });
+    saveEntries(entries);
+    document.getElementById('entryText').value = '';
+    document.getElementById('wordcount').textContent = '0 words';
+
+    clearTimeout(feedbackTimer);
+    feedbackEl.classList.add('show');
+    feedbackTimer = setTimeout(() => feedbackEl.classList.remove('show'), 2400);
+  });
+
+  // ─── AUTH OVERLAY ───
+  const authOverlay   = document.getElementById('authOverlay');
+  const authError     = document.getElementById('authError');
+  const authPassInput = document.getElementById('authPass');
+
+  function showAuthOverlay(onSuccess) {
+    authPassInput.value = '';
+    clearError('authError');
+    authOverlay.classList.add('active');
+    setTimeout(() => authPassInput.focus(), 100);
+
+    const confirm = async () => {
+      const ok = await verifyPassword(authPassInput.value);
+      if (!ok) {
+        authPassInput.value = '';
+        showError('authError', 'That doesnt seem right.');
+        return;
+      }
+      closeAuth();
+      onSuccess();
+    };
+
+    const cancel = () => closeAuth();
+
+    function closeAuth() {
+      authOverlay.classList.remove('active');
+      document.getElementById('authConfirmBtn').removeEventListener('click', confirm);
+      document.getElementById('authCancelBtn').removeEventListener('click', cancel);
+      authPassInput.removeEventListener('keydown', keyHandler);
+    }
+
+    function keyHandler(e) { if(e.key==='Enter') confirm(); if(e.key==='Escape') cancel(); }
+
+    document.getElementById('authConfirmBtn').addEventListener('click', confirm);
+    document.getElementById('authCancelBtn').addEventListener('click', cancel);
+    authPassInput.addEventListener('keydown', keyHandler);
+  }
+
+  // ─── ENTRIES PANEL ───
+  const entriesPanel = document.getElementById('entriesPanel');
+
+  document.getElementById('openEntriesBtn').addEventListener('click', () => {
+    showAuthOverlay(() => openEntriesPanel());
+  });
+
+  document.getElementById('closeEntriesBtn').addEventListener('click', closeEntriesPanel);
+
+  function openEntriesPanel() {
+    renderEntries();
+    entriesPanel.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeEntriesPanel() {
+    entriesPanel.classList.remove('open');
+    document.body.style.overflow = '';
+    setTimeout(() => { document.getElementById('entriesList').innerHTML = ''; }, 700);
+  }
+
+  function renderEntries() {
+    const entries = loadEntries();
+    const list = document.getElementById('entriesList');
+    const countEl = document.getElementById('entriesCount');
+    countEl.textContent = entries.length === 1 ? '1 entry' : entries.length + ' entries';
+
+    if (!entries.length) {
+      list.innerHTML = '<p class="no-entries">Nothing saved yet.</p>';
+      return;
+    }
+
+    list.innerHTML = '';
+
+    entries.forEach((entry, i) => {
+      const preview = entry.body.replace(/\n/g, ' ').slice(0, 60) + (entry.body.length > 60 ? '…' : '');
+
+      const item = document.createElement('div');
+      item.className = 'entry-item';
+
+      item.innerHTML = `
+        <button class="entry-toggle" aria-expanded="false">
+          <span class="entry-date">${formatDateShort(entry.ts)}</span>
+          <span class="entry-preview">${escapeHtml(preview)}</span>
+          <svg class="entry-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M6 9l6 6 6-6"/>
+          </svg>
+        </button>
+        <div class="entry-body">
+          <div class="entry-content">${escapeHtml(entry.body)}</div>
+          <button class="entry-delete" data-id="${entry.id}">delete this entry</button>
+        </div>
+      `;
+
+      const toggle = item.querySelector('.entry-toggle');
+      const body   = item.querySelector('.entry-body');
+
+      toggle.addEventListener('click', () => {
+        const expanded = item.classList.toggle('expanded');
+        toggle.setAttribute('aria-expanded', expanded);
+      });
+
+      item.querySelector('.entry-delete').addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = parseInt(e.target.dataset.id);
+        const all = loadEntries().filter(en => en.id !== id);
+        saveEntries(all);
+        item.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        item.style.opacity = '0';
+        item.style.transform = 'translateX(-8px)';
+        setTimeout(() => { item.remove(); countEl.textContent = all.length === 1 ? '1 entry' : all.length + ' entries'; }, 300);
+      });
+
+      list.appendChild(item);
+    });
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ─── INIT ───
+  function init() {
+    const hasHash = !!localStorage.getItem(HASH_KEY);
+    if (!hasHash) {
+      showScreen('setupScreen');
+      setTimeout(() => document.getElementById('setupPass').focus(), 300);
+    } else {
+      showScreen('loginScreen');
+      setTimeout(() => document.getElementById('loginPass').focus(), 300);
+    }
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
